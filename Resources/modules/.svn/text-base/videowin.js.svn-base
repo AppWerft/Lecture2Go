@@ -1,0 +1,23 @@
+exports.create = function(item) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = require('/modules/l2g').create(item.title);
+	self.rightbutton.opacity = 1;
+	//		orientationModes : [Titanium.UI.LANDSCAPE_LEFT, Titanium.UI.LANDSCAPE_RIGHT]
+	if (item.mp4) {
+		var videoPlayer = Ti.Media.createVideoPlayer({
+			width : w,
+			height : w*0.66,
+			allowsAirPlay : true,
+			top:w/6,
+			mediaControlStyle : Titanium.Media.VIDEO_CONTROL_DEFAULT,
+			scalingMode : Titanium.Media.VIDEO_SCALING_ASPECT_FIT
+		});
+		videoPlayer.media = item.url;
+		//videoPlayer.play();
+		self.add(videoPlayer);
+	} else {
+		var url = 'http://fms.rrz.uni-hamburg.de/vod/_definst_/mp4:3l2gfrdv178/hl_petersen_2010-11-04_18-00.mp4';
+
+	}
+	return self;
+}

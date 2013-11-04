@@ -1,0 +1,9 @@
+exports.create = function(model, title) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = require('/modules/l2g').create('Suchergebnis');
+	self.tv = Ti.UI.createTableView({
+		top : w / 6
+	});
+	self.add(self.tv);
+	return self;
+}

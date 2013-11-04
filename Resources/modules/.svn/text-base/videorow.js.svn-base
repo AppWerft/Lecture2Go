@@ -1,0 +1,68 @@
+exports.create = function(item) {
+	var movie = {};
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var row = Ti.UI.createTableViewRow({
+		hasChild : true,
+		selectedBackgroundColor : 'gray',
+		backgroundColor : 'white',
+	});
+	if (item.enclosure) {
+		var url = item.enclosure.url;
+		var imageurl = url.replace(/fms1\.rrz\.uni\-hamburg\.de\/abo/, 'lecture2go.uni-hamburg.de/images').replace(/mp4/, 'jpg');
+		movie.url = url;
+		movie.mp4 = true;
+	} else {
+		movie.url = item.link;
+		movie.mp4 = false;
+		imageurl = item.image;
+	}
+	var thumbnail = Ti.UI.createImageView({
+		width : w/4,
+		left : 0,
+		top : 0,
+		defaultImage : '',
+		image : imageurl,
+		height : Ti.UI.SIZE
+	});
+	row.add(thumbnail);
+	var container = Ti.UI.createView({
+		top : 0,
+		left : w/3.5,
+		layout : 'vertical',
+		height : Ti.UI.SIZE
+	});
+	row.add(container);
+	container.add(Ti.UI.createLabel({
+		text : item.author,
+		left : 0,
+		height : Ti.UI.SIZE,
+		top : 5,
+		bottom : 0,
+		color : 'black',
+		width : Ti.UI.FILL,
+		font : {
+			fontSize : w/20,
+			fontFamily: 'TheSans-B6SemiBold'
+		}
+	}));
+	container.add(Ti.UI.createLabel({
+		text : item.title,
+		left : 5,
+		right : 5,
+		top : 5,
+		bottom : 5,
+		height : Ti.UI.SIZE,
+		color : 'black',
+		width : Ti.UI.FILL,
+		font : {
+			fontSize : w/23,
+			fontFamily: 'TheSans-B6SemiBold'
+		}
+	}));
+	movie.author = item.author;
+	movie.title = item.title;
+	row.movie = movie;
+	
+	return row;
+
+}

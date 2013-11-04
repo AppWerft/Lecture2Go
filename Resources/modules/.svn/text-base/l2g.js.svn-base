@@ -1,0 +1,51 @@
+exports.create = function(_options) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = Ti.UI.createWindow({
+		navBarHidden : true,
+		backgroundColor : Ti.UI.iOS.COLOR_SCROLLVIEW_BACKGROUND
+	});
+	self.navbar = Ti.UI.createView({
+		height : w / 8,
+		top : 0,
+		backgroundColor : 'red'
+	});
+	self.navtitle = Ti.UI.createLabel({
+		left : w / 60,
+		right : w / 10,
+		width : Ti.UI.FILL,
+		text : _options.title,
+		font : {
+			fontWeight : 'bold',
+			fontSize : w / 20,
+			fontFamily : 'TheSans-B6SemiBold'
+		},
+		color : 'white'
+	});
+	self.rightbutton = Ti.UI.createButton({
+		title : '★',
+		top : 0,
+		font : {
+			fontSize : w / 12,
+		},
+		right : 0,
+		height : w / 8,
+		width : w / 8,
+		opacity : 0
+	});
+	self.navbar.add(self.navtitle);
+	if (_options.back) {
+		self.navbar.addEventListener('click', function(e) {
+			try {
+				self.close({
+					animated : true
+				});
+			} catch(E) {
+			}
+		});
+	}
+	self.add(self.navbar);
+	self.navbar.add(self.rightbutton);
+	if (_options.message)
+		self.add(require('modules/parts/actind').create(_options.message));
+	return self;
+}

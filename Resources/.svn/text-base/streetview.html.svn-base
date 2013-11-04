@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
+<script type="text/javascript">
+  var map;
+  
+  var sv = new google.maps.StreetViewService();
+  var panorama;
+
+  function initSV(posi) {
+  
+    panorama = new google.maps.StreetViewPanorama(document.getElementById("pano"),{navigationControl:false,linksControl: false,enableCloseButton: false,});
+    sv.getPanoramaByLocation(new google.maps.LatLng(posi.lat,posi.lng), 150, processSVData);
+   } 
+ 
+   function processSVData(data, status) {
+    if (status == google.maps.StreetViewStatus.OK) {
+      panorama.setVisible(true);
+      panorama.setPano(data.location.pano);
+      panorama.setPov({heading: 10,pitch: 0,zoom: 1});
+      panorama.setVisible(true);
+      
+    }
+  }
+</script>
+</head>
+<body>
+  <div id="pano" style="width:100%; height:100%;">StreetMapKarte</div>
+</body>
+</html>

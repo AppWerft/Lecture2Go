@@ -1,0 +1,29 @@
+exports.create = function() {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = Ti.UI.createWindow({
+		backgroundColor : 'white'
+	});
+	var rota = require('path.animator');
+	self.add(Ti.UI.createImageView({
+		image : '/assets/Default.png',
+		bottom : 0,
+	}));
+	var logocontainer = rota.createView({
+		width : Ti.UI.SIZE,
+		height : Ti.UI.SIZE
+	});
+	var logo = Ti.UI.createImageView({
+		image : '/assets/logo.png',
+		width : w / 3,
+		height : w / 6
+	});
+	logocontainer.add(logo);
+	logocontainer.rotate({
+		angle : 2880,
+		duration : 6000,
+		delay : 100,
+		timingFunction : Ti.UI.iOS.ANIMATION_CURVE_EASE_OUT
+	});
+	self.add(logocontainer);
+	return self;
+}

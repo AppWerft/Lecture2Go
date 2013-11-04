@@ -1,0 +1,92 @@
+exports.create = function(title) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = require('modules/l2g').create({
+		title : title
+	});
+	var tv = Ti.UI.createTableView({
+		top : w / 8,
+		backgroundColor : 'transparent'
+	});
+	Ti.App.Model.getFakultaeten('veranstaltungen', function(data) {
+		function insertRows(section, fakultaetId) {
+			Ti.App.Model.getFachbereiche(fakultaetId, function(data) {
+				for (var bereichId in data) {
+					var id = fakultaetId + ':' + bereichId;
+					var row = Ti.UI.createTableViewRow({
+						backgroundColor : '#fff',
+						hasChild : true,
+						kurs : {
+							id : id,
+							title : data[bereichId]
+						}
+					});
+					row.add(Ti.UI.createLabel({
+						text : data[bereichId],
+						color : 'black',
+						width : Ti.UI.FILL,
+						left : 5,
+						top : 10,
+						right : 10,
+						bottom : 5,
+						height : Ti.UI.SIZE,
+						font : {
+							fontSize : w / 18,
+							fontWeight : 'bold',
+							fontFamily : 'TheSans-B6SemiBold'
+						}
+					}));
+					section.add(row);
+				}
+				tv.setData(sections);
+			});
+		}
+
+		var sections = [];
+		for (var fakultaetId in data) {
+			var view = Ti.UI.createView({
+				backgroundColor : 'gray',
+				height : w / 16
+			});
+			view.add(Ti.UI.createLabel({
+				text : data[fakultaetId],
+				left : 5,
+				height : Ti.UI.SIZE,
+				width : Ti.UI.FILL,
+				color : 'white',
+				font : {
+					fontSize : w / 25,
+					fontFamily : 'TheSans-B6SemiBold'
+				}
+			}));
+			var section = Titanium.UI.createTableViewSection({
+				headerView : view,
+				fakultaetId : fakultaetId
+			});
+			insertRows(section, fakultaetId);
+			sections.push(section);
+		}
+		setTimeout(function() {
+			tv.setData(sections);
+		}, 200);
+		// Klick auf erste Liste
+		tv.addEventListener('click', function(e) {
+			if (tv.active)
+				return;
+			tv.active = true;
+			var kursWin = require('modules/kanaelebykurs').create(e.row.kurs);
+			self.tab.open(kursWin, {
+				animated : true
+			});
+			setTimeout(function() {
+				tv.active = false;
+			}, 500);
+		});
+	});
+	self.add(tv);
+	self.addEventListener('focus', function() {
+		Ti.App.fireEvent('tab1_changed', {
+			label : 'Fakultätsbereiche'
+		})
+	});
+	return self;
+}

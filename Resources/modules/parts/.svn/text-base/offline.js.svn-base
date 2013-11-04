@@ -1,0 +1,8 @@
+exports.create = function() {
+	var dialog = Ti.UI.createAlertDialog({
+		ok : 'OK',
+		message : 'Das Videoportal benötigt eine Internetverbindung. Da scheint es ein Problem zu geben',
+		title : 'Offline'
+	});
+	dialog.show();
+}

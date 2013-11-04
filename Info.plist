@@ -18,7 +18,6 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>lecture2go</string>
-				
 			</array>
 		</dict>
 	</array>
@@ -44,19 +43,18 @@
 		<string>appicon@2x.png</string>
 	</array>
 	<key>UIAppFonts</key>
-		<array>
-		<string>/ttf/TheSans_B5.ttf</string>	
-		<string>/ttf/TheSans_B6.ttf</string>	
-
+	<array>
+		<string>/ttf/TheSans_B5.ttf</string>
+		<string>/ttf/TheSans_B7.ttf</string>
+		<string>/ttf/TheSans_B6.ttf</string>
 	</array>
-
 	<key>UISupportedInterfaceOrientations~ipad</key>
-		<array>
+	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
-		<array>
+	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIStatusBarStyle</key>

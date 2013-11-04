@@ -1,0 +1,44 @@
+exports.create = function(model) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = Ti.UI.createView({
+		backgroundImage : '/assets/qr.png',
+		top : w / 80,
+		right : w / 80,
+		height : w / 10,
+		width : w / 10,
+		borderRadius : w / 80,
+		enabled : true
+	});
+	self.addEventListener('click', function() {
+		var dialog = Ti.UI.createAlertDialog({
+			cancel : 1,
+			buttonNames : ['Ja', 'Abbruch'],
+			message : 'QR-Code einscannen?',
+			title : 'QR-Code'
+		});
+		dialog.addEventListener('click', function(e) {
+			switch (e.index) {
+				case 0:
+					var Barcode = require('ti.barcode');
+					Barcode.allowRotation = true;
+					Barcode.displayedMessage = '';
+					Barcode.useLED = false;
+					Barcode.capture({
+						animate : false,
+						showCancel : true,
+						keepOpen : false
+					});
+					Barcode.addEventListener('cancel', function(_e) {
+						model.importScanURL('http://lecture2go.uni-hamburg.de/konferenzen/-/k/10');
+					});
+					Barcode.addEventListener('success', function(_e) {
+						model.importScanURL(_e.result);
+						Barcode.cancel();
+					});
+					break;
+			}
+		});
+		dialog.show();
+	});
+	return self;
+}

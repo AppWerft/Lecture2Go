@@ -1,0 +1,100 @@
+exports.create = function(title) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = require('/modules/l2g').create({
+		title : title,
+		message : 'Besorge persönliche Daten.'
+	});
+	self.navbar.add(require('modules/parts/scanbutton').create());
+	self.mytableview = require('modules/parts/tableview').create();
+	self.add(self.mytableview);
+	var CHANNELS = 0, MOVIES = 1, RECENTS = 2;
+	var sections = [];
+	sections[CHANNELS] = require('/modules/parts/section').create('channel', 'meine abonnierten Kanäle');
+	sections[MOVIES] = require('/modules/parts/section').create('movie', 'meine favorisierten Videos');
+	sections[RECENTS] = require('/modules/parts/section').create('movie', 'meine letztgesehene Videos');
+	self.mytableview.setData(sections);
+
+	Ti.App.addEventListener('favs_changed', function(data) {
+		var rows = [];
+		var favs = data.favs;
+		var length = favs.length;
+		while (sections[CHANNELS].rowCount) {
+			self.mytableview.data[CHANNELS].remove(sections[CHANNELS].rows[0])
+		}
+		for (var i = 0; i < length; i++) {
+			rows[i] = Ti.UI.createTableViewRow({
+				backgroundColor : '#fff',
+				hasChild : true,
+				kanal : favs[i]
+			});
+			rows[i].add(Ti.UI.createLabel({
+				text : favs[i].label,
+				color : 'black',
+				width : Ti.UI.FILL,
+				left : 5,
+				top : 10,
+				right : 10,
+				bottom : 5,
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : w / 18,
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B6SemiBold'
+				}
+			}));
+			sections[CHANNELS].add(rows[i]);
+		}
+		self.mytableview.setData(sections);
+	});
+
+	Ti.App.addEventListener('recentmovies_changed', function(data) {
+		var rows = [];
+		var movies = data.movies;
+		while (sections[RECENTS].rowCount) {
+			self.mytableview.data[RECENTS].remove(sections[RECENTS].rows[0])
+		}
+		for (var i = 0; i < movies.length; i++) {
+			var row = Ti.UI.createTableViewRow({
+				backgroundColor : '#fff',
+				hasChild : true,
+				movie : movies[i]
+			});
+			row.add(Ti.UI.createLabel({
+				text : movies[i].label,
+				color : 'black',
+				width : Ti.UI.FILL,
+				left : 5,
+				top : 10,
+				right : 10,
+				bottom : 5,
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : w / 18,
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B6SemiBold'
+				}
+			}));
+			sections[RECENTS].add(row);
+		}
+		self.mytableview.setData(sections);
+	});
+
+	self.mytableview.addEventListener('click', function(_e) {
+
+		switch (_e.section.type) {
+			case 'channel':
+				var channelWin = require('modules/kanal').create(_e.row.kanal);
+				self.tab.open(channelWin);
+				break;
+			case 'movie':
+				break;
+		}
+	});
+	self.addEventListener('focus', function() {
+		//model.getFavs();
+		//model.getRecentMovies();
+		
+	});
+
+	return self;
+}

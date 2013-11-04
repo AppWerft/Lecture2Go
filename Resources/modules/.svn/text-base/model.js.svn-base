@@ -1,0 +1,310 @@
+var Model = function() {
+	this.url = 'http://lecture2go.uni-hamburg.de/veranstaltungen?p_p_id=gastVeranstaltungen_WAR_lecture2gogastspringportlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1';
+	this.DB = Ti.Database.install('/lecture2go.db', 'l2g_7');
+	if (Ti.Platform.name === 'iPhone OS') {
+		this.DB.file.setRemoteBackup(false);
+	}
+	//	Ti.API.log(this.DB.file);
+	this.getFavs();
+	this.getLatest();
+}
+
+Model.prototype.importScanURL = function(_result) {
+	function Alert() {
+		var dialog = Ti.UI.createAlertDialog({
+			buttonNames : ['OK'],
+			message : 'Dieser QR-Code ist nicht gültig. Er sollte die URL eines Videos im lecture2go-Portal sein.',
+			title : 'Ungültiger QR-Code'
+		});
+		dialog.show();
+	}
+
+	var regex = /http\:\/\/lecture2go\.uni\-hamburg\.de\/(konferenzen|veranstaltungn)\/\-\/(k|v)\/(\d+)/
+	if (regex.test(_result)) {
+		this.getVideoKeyByHomepage(_result, function(_e) {
+			if (_e) {
+				var dialog = Ti.UI.createAlertDialog({
+					buttonNames : ['OK', 'Abbruch'],
+					message : 'Soll ' + _e + ' zu den Favoriten hinzugefügt werden?',
+					title : 'Videoimport'
+				});
+				dialog.show();
+			} else
+				Alert();
+		});
+	} else {
+		Alert();
+	}
+}
+
+Model.prototype.setFav = function(kanal) {
+	var date = new Date();
+	this.DB.execute('INSERT INTO channels (id,fav,label,ctime,atime) VALUES (?,?,?,?,?)', kanal.id, 1, kanal.label, date.getTime(), date.getTime());
+	this.getFavs();
+}
+
+Model.prototype.setMovie = function(movie) {
+	var date = new Date();
+	this.DB.execute('INSERT INTO movies (url,fav,author,label,ctime,atime) VALUES (?,?,?,?,?,?)', movie.url, 0, movie.author, movie.label, date.getTime(), date.getTime());
+	this.getRecentMovies();
+}
+
+Model.prototype.getRecentMovies = function() {
+	var result = this.DB.execute('SELECT * from movies WHERE fav=0 ORDER BY ctime DESC');
+	var list = [];
+	while (result.isValidRow()) {
+		var movie = {
+			label : result.fieldByName('label'),
+			url : result.fieldByName('url'),
+			author : result.fieldByName('author'),
+		};
+		list.push(movie);
+		result.next();
+	}
+	result.close();
+	Ti.App.fireEvent('recentmovies_changed', {
+		movies : list
+	});
+}
+
+Model.prototype.getFavs = function() {
+	var favs = this.DB.execute('SELECT * from channels WHERE fav=1 ORDER BY ctime DESC');
+	var favlist = [];
+	while (favs.isValidRow()) {
+		var fav = {
+			label : favs.fieldByName('label'),
+			id : favs.fieldByName('id')
+		};
+		favlist.push(fav);
+		favs.next();
+	}
+	favs.close();
+	Ti.App.fireEvent('favs_changed', {
+		favs : favlist
+	});
+}
+
+Model.prototype.isFav = function(id) {
+	var is = 0;
+	var fav = this.DB.execute('SELECT COUNT(*) total from channels WHERE id=' + id);
+	if (fav.isValidRow()) {
+		is = fav.fieldByName('total');
+	}
+	fav.close();
+	return is;
+}
+
+Model.prototype.getPlaylistByHomepage = function(_url, _callback) {
+	var xhr = Ti.Network.createHTTPClient({
+		onload : function(e) {
+			var regex = /embed\.html\?src=(.*?)\/manifest\.f4m/gm;
+			var res = regex.exec(this.responseText);
+			if ( typeof (_callback) === 'function')
+				_callback(res[1] + '/playlist.m3u8');
+		},
+		onerror : function(e) {
+			Ti.API.log(e.error);
+		},
+		timeout : 55000
+	});
+	xhr.open("GET", _url);
+	xhr.send();
+}
+
+Model.prototype.getVideoKeyByHomepage = function(_url, _callback) {
+	var xhr = Ti.Network.createHTTPClient({
+		onload : function(e) {
+			var regex = /_definst_\/mp4\:(.*?)\.mp4\/manifest\.f4m/gm;
+			var res = regex.exec(this.responseText);
+			_callback(res[1]);
+		},
+		onerror : function(e) {
+			Ti.API.log(e.error);
+		},
+		timeout : 55000
+	});
+	xhr.open("GET", _url);
+	xhr.send();
+}
+Model.prototype.getLatest = function() {
+	function getImage(foo) {
+		return foo.a.img.src
+	}
+
+	function getLink(foo) {
+		return foo.a.href;
+	}
+
+	function getMeta(foo) {
+		return {
+			author : foo.div[0].p.content,
+			date : foo.div[0].p.span.content,
+			description : foo.div[1].p
+		}
+	}
+
+
+	Ti.Yahoo.yql('SELECT * FROM html WHERE url="http://lecture2go.uni-hamburg.de/l2gos" and xpath="//tr"', function(y) {
+		Ti.App.fireEvent('data_ready');
+		if (y.data) {
+			var movies = [];
+			for (var i = 0; i < y.data.tr.length; i++) {
+				var tr = y.data.tr[i];
+				if (!tr.id == 'kachelsmall' || !tr.td[0] || !tr.td[0].a)
+					continue;
+				movies.push({
+					image : getImage(tr.td[0]),
+					link : getLink(tr.td[0]),
+					meta : getMeta(tr.td[2])
+				});
+				//	Ti.API.log();
+				movies.push({
+					image : getImage(tr.td[3]),
+					link : getLink(tr.td[3]),
+					meta : getMeta(tr.td[5])
+				});
+
+				// linkes Bild: 0
+				// linker Text: 3
+				// rechtes Bild: 4
+				// rechter Text: 6
+				try {
+					/*movies.push({
+					 imgurl : tr.td[0].a.img.src,
+					 homepage : tr.td[2].a.href,
+					 author : tr.td[2].div[0].p.content,
+					 date : tr.td[2].div[0].p.span.content,
+					 });*/
+				} catch(E) {
+					//	Ti.API.log(tr.td[0]);
+				}
+
+			}
+			Ti.App.fireEvent('app:latestready', {
+				movies : movies
+			});
+			return;
+		}
+		require('modules/parts/offline').create();
+	});
+}
+
+Model.prototype.getFakultaeten = function(_type, _callback) {
+	this.Model = {};
+	var self = this;
+	if (Ti.App.Properties.hasProperty('fakultaeten')) {
+		var fakultaeten = Ti.App.Properties.getString('fakultaeten');
+		this.cached = true;
+	}
+	if (!Ti.Network.online) {
+		require('modules/parts/offline').create();
+	}
+	Ti.Yahoo.yql('SELECT * FROM html WHERE url="' + "http://lecture2go.uni-hamburg.de/" + _type + "/" + '" and xpath="//form"', function(y) {
+		if (!y.data) {
+			Ti.App.fireEvent('data_ready');
+			require('modules/parts/offline').create();
+			return;
+		}
+		var form = y.data.form[1];
+		self.url = form.action;
+		if (self.cached == true)
+			return;
+		var options = form.select.option;
+		for (var i = 1; i < options.length; i++) {
+			var fakultaetId = options[i].value;
+			self.Model[fakultaetId] = options[i].content;
+			//getsubs(0, fakultaetId);
+		}
+		Ti.App.Properties.setString('fakultaeten', JSON.stringify(self.Model));
+		_callback(self.Model);
+	});
+	if (this.cached)
+		_callback(JSON.parse(fakultaeten));
+}
+
+Model.prototype.getFachbereiche = function(_fakultaetId, _callback) {
+	if (Ti.App.Properties.hasProperty('fakultaeten' + _fakultaetId)) {
+		var f = Ti.App.Properties.getString('fakultaeten' + _fakultaetId);
+		Ti.App.fireEvent('data_ready');
+		_callback(JSON.parse(f));
+		return;
+	}
+	var url = this.url + '&fakultaetId=' + _fakultaetId + '&currentPage=0';
+	var self = this;
+	Ti.Yahoo.yql('SELECT * FROM html WHERE url="' + url + '" AND xpath="//select[1]"', function(y) {
+		Ti.App.fireEvent('data_ready');
+		try {
+			var options = y.data.select[1].option;
+			var bereiche = {};
+			for (var i = 1; i < options.length; i++) {
+				var bereichId = options[i].value;
+				bereiche[bereichId] = options[i].content;
+				//		getsubs(0,options[i].value);
+			}
+			Ti.App.Properties.setString('fakultaeten' + _fakultaetId, JSON.stringify(bereiche));
+			_callback(bereiche);
+		} catch (E) {
+		}
+
+	});
+}
+
+Model.prototype.getKanaeleByKurs = function(_id, _callback) {
+	var key = 'kurs_' + _id;
+	if (Ti.App.Properties.hasProperty(key)) {
+		var f = Ti.App.Properties.getString(key);
+		Ti.App.fireEvent('data_ready');
+		_callback(JSON.parse(f));
+		return;
+	}
+	if (!Ti.Network.online)
+		require('modules/parts/offline').create();
+	var url = this.url + '&currentPage=0&fakultaetId=' + _id.split(':')[0] + '&subEinrichtung1Id=' + _id.split(':')[1];
+	Ti.Yahoo.yql('SELECT * FROM html WHERE url="' + url + '" AND xpath="//select"', function(y) {
+		var options = y.data.select[2].option;
+		var course = {};
+		Ti.App.fireEvent('data_ready');
+		for (var i = 1; i < options.length; i++) {
+			var coursedataId = _id + ':' + options[i].value;
+			course[coursedataId] = options[i].content;
+		}
+		Ti.App.Properties.setString(key, JSON.stringify(course));
+		_callback(course);
+	});
+}
+// Click on third select => give us channel
+// template: http://lecture2go.uni-hamburg.de/rss/3851.mp4.xml
+// first id 3786
+Model.prototype.getMoviesByChannel = function(_id, _callback) {
+	function getXML(_nr, _path, _callback) {
+		var nr = _nr;
+		Ti.Yahoo.yql('SELECT * FROM xml WHERE url="http://lecture2go.uni-hamburg.de' + _path + '"', function(xml) {
+			if (!xml.data) {
+				require('modules/parts/offline');
+				return;
+			}
+			var channel = xml.data.rss.channel.item;
+			var res = {
+				nr : nr,
+				playlist : ( channel instanceof Array) ? channel : [channel]
+			};
+			Ti.App.fireEvent('data_ready');
+			_callback(res);
+		});
+	}
+
+	var url = this.url + '&currentPage=0&fakultaetId=' + _id.split(':')[0] + '&subEinrichtung1Id=' + _id.split(':')[1] + '&coursedataId=' + _id.split(':')[2];
+	Ti.Yahoo.yql('SELECT href FROM html WHERE url="' + url + '" AND xpath="//a"', function(y) {
+		var ankers = y.data.a;
+		for (var i = 0; i < ankers.length; i++) {
+			//"/rss/3872.mp4.xml";
+			var regex = /\/rss\/(.*?)\.mp4\.xml/;
+			if (regex.test(ankers[i].href)) {
+				var nr = regex.exec(ankers[i].href)[1];
+				getXML(nr, ankers[i].href, _callback);
+			}
+		}
+	});
+}
+
+module.exports = Model;

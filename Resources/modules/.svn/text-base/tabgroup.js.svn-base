@@ -1,0 +1,61 @@
+exports.create = function(model) {
+
+	var self = Ti.UI.createTabGroup(model);
+	setTimeout(function() {
+		var tab1 = Titanium.UI.createTab({
+			icon : '/assets/45-movie.png',
+			title : 'Neueste',
+			window : require('modules/latestpopular').create('latest')
+		});
+		var tab2 = Titanium.UI.createTab({
+			icon : '/assets/45-movie.png',
+			title : 'Beliebteste',
+			window : require('/modules/latestpopular').create('popular')
+		});
+		var tab3 = Titanium.UI.createTab({
+			icon : '/assets/137-presentation.png',
+			title : 'Fakultäten',
+			window : require('modules/fakultaeten').create('Fakultäten')
+		});
+		var tab4 = Titanium.UI.createTab({
+			icon : '/assets/55-network.png',
+			title : 'CampusNavigator',
+			window : require('/modules/campusnavigator/map').create('Campusnavigator', '')
+		});
+		var tab5 = Titanium.UI.createTab({
+			icon : '/assets/111-user.png',
+			title : 'myLecture2Go',
+			window : require('modules/mylecture2go').create('myLecture2Go')
+		});
+		Ti.App.addEventListener('favs_changed', function(e) {
+			var favs = e.favs;
+			if (e.favs.length)
+				tab5.badge = e.favs.length;
+			else
+				tab5.badge = null;
+		});
+		Ti.App.addEventListener('tab1_changed', function(e) {
+			tab3.title = e.label;
+		});
+		self.addTab(tab1);
+		self.addTab(tab2);
+		self.addTab(tab3);
+		self.addTab(tab4);
+		self.addTab(tab5);
+		var dialog = require('/modules/login/dialog').create({}, function(_user) {
+			console.log(_user);
+			self.user = _user;
+			tab5.window.navtitle.text = _user.title;
+		//	tab5.window.add(require('modules/login/usermessage').create(self.user));
+		});
+		tab5.addEventListener('focus', function(t) {
+			if (!self.user)
+				dialog.open();
+		});
+		tab5.addEventListener('blur', function(t) {
+			dialog.close();
+		});
+	}, 20);
+
+	return self;
+}

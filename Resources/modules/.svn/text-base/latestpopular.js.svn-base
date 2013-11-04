@@ -1,0 +1,162 @@
+exports.create = function(type) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var fadein = Ti.UI.createAnimation({
+		opacity : 0.7,
+		duration : 800
+	});
+	var views = [];
+	var currentview;
+	var search = Titanium.UI.createSearchBar({
+		barColor : '#000',
+		showCancel : true,
+		height : w / 8,
+		top : w / 8
+	});
+	var self = require('modules/l2g').create({
+		title : (type == 'latest') ? 'Neueste' : 'Beliebteste'
+	});
+	search.addEventListener('cancel', function() {
+		search.blur();
+	});
+	search.addEventListener('return', function() {
+		if (search.value.length < 5)
+			return;
+		Ti.App.Model.searchMovies(search.value);
+		var searchwin = require('modules/search').create();
+		self.tab.open(searchwin);
+		var web = Ti.UI.createWebView({
+			url : 'http://lecture2go.uni-hamburg.de/web/lecture2go/suche?p_p_id=gastSearch_WAR_lecture2gogastspringportlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&search=' + encodeURI(search.url),
+			disableBounce : true
+		});
+		searchwin.add(web);
+
+	});
+
+	self.add(search);
+
+	self.bottomcontainer = Ti.UI.createScrollableView({
+		bottom : 0,
+		top : w / 3,
+		height : Ti.UI.FILL,
+		left : -w * 0.1,
+		width : w * 1.2,
+
+		showPagingControl : true
+	});
+	self.bottomcontainer.addEventListener('scroll', function() {
+		self.play.opacity = 0;
+		search.blur();
+		if (self.videoPlayer) {
+			if (self.videoPlayer.playing)
+				self.videoPlayer.stop();
+			self.videoPlayer.parent.remove(self.videoPlayer);
+			self.videoPlayer = null;
+		}
+	});
+	self.bottomcontainer.addEventListener('scrollend', function(_e) {
+		self.navtitle.text = (type == 'latest') ? 'Neueste' : 'Beliebteste';
+		self.play.animate(fadein);
+		currentview = _e.view;
+	});
+	self.add(self.bottomcontainer);
+	self.play = Ti.UI.createImageView({
+		image : '/assets/play.png',
+		width : w / 5,
+		height : Ti.UI.SIZE,
+		bottom : w / 4,
+		opacity : 0
+	});
+
+	Ti.App.addEventListener('app:latestready', function(_data) {
+		var movies = _data.movies.slice((type == 'latest') ? 0 : 8, (type == 'latest') ? 8 : -1);
+		for (var i = 0; i < 8; i++) {
+			movies[i].mp4 = movies[i].image.replace(/lecture2go\.uni\-hamburg\.de\/images/, 'fms1.rrz.uni-hamburg.de/abo').replace(/jpg/, 'mp4');
+			views[i] = Ti.UI.createView({
+				width : w,
+				borderRadius : w / 50,
+				backgroundColor : 'white',
+				height : Ti.UI.FILL,
+				mp4 : movies[i].mp4,
+				link : movies[i].link,
+				author : movies[i].meta.author,
+				label : movies[i].meta.description,
+			});
+			var container = Ti.UI.createView({
+				layout : 'vertical',
+				bottom : w * .6,
+				height : Ti.UI.SIZE,
+				width : Ti.UI.FILL,
+				left : w / 30
+			});
+			views[i].add(container);
+			container.add(Ti.UI.createLabel({
+				color : 'black',
+				left : 0,
+				text : movies[i].meta.author,
+				font : {
+					fontSize : w / 22,
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B6SemiBold'
+				},
+				width : Ti.UI.FILL,
+				height : Ti.UI.SIZE,
+				top : 10
+			}));
+			container.add(Ti.UI.createLabel({
+				color : 'black',
+				text : movies[i].meta.description,
+				left : 0,
+				font : {
+					fontSize : w / 18,
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B6SemiBold'
+				},
+				width : Ti.UI.FILL,
+				height : Ti.UI.SIZE,
+				top : 5
+			}));
+			container.add(Ti.UI.createLabel({
+				color : 'black',
+				text : movies[i].meta.date,
+				left : 0,
+				font : {
+					fontSize : w / 22,
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B6SemiBold'
+				},
+				width : Ti.UI.FILL,
+				height : Ti.UI.SIZE,
+				top : 5,
+				bottom : w / 20
+			}));
+			views[i].add(Ti.UI.createImageView({
+				image : movies[i].image,
+				bottom : 0,
+				width : w,
+				height : w * .6,
+				touchEnabled : false
+			}));
+		}
+		self.bottomcontainer.views = views;
+		self.play.animate(fadein);
+		currentview = views[0];
+	});
+	self.play.addEventListener('click', function(_e) {
+		self.play.opacity = 0;
+		Ti.App.Model.setMovie({
+			url : currentview.mp4,
+			label : currentview.label,
+			author : currentview.author
+		});
+		self.videoPlayer = require('modules/parts/videoplayer').create(currentview);
+		self.videoPlayer.addEventListener('fullscreen', function(_e) {
+			if (_e.entering === true)
+				self.orientationModes = [Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT];
+			else
+				self.orientationModes = [Ti.UI.PORTRAIT, Ti.UI.UPSIDE_PORTRAIT];
+		});
+		self.add(self.videoPlayer);
+	});
+	self.add(self.play);
+	return self;
+}

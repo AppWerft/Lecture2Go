@@ -1,0 +1,27 @@
+exports.create = function(key, val) {
+	var row = Ti.UI.createTableViewRow({
+		backgroundColor : '#fff',
+		hasChild : true,
+		kurs : {
+			title : val,
+			id : id + ':' + key
+		}
+	});
+	row.add(Ti.UI.createLabel({
+		text : val,
+		color : 'black',
+		width : Ti.UI.FILL,
+		left : 5,
+		top : 10,
+		right : 10,
+		bottom : 5,
+		height : Ti.UI.SIZE,
+		font : {
+			fontSize : w / 18,
+			fontWeight : 'bold',
+			fontFamily : 'TheSans-B6SemiBold'
+		}
+	}));
+	return row;
+}
+

@@ -1,0 +1,23 @@
+(function() {
+	Ti.UI.iPhone.hideStatusBar();
+	var introWin = require('modules/intro').create();
+	var modelObj = require('modules/model');
+	var model = new modelObj();
+	Ti.App.Model = model;
+	var tabgroup = require('modules/tabgroup').create(model);
+	introWin.open();
+	setTimeout(function() {
+		tabgroup.open();
+		Ti.UI.iPhone.showStatusBar();
+	}, 5000);
+})();
+
+
+/*
+
+ scp /Users/fuerst/Documents/Titanium\ Studio\ Workspace/lecture2go/build/iphone/build/Debug-iphoneos/*.ipa ra1n3r@webmasterei.com:/hausweb/tools/l2g
+
+ https://shib.stine.uni-hamburg.de/idp/Authn/UserPassword
+ https://uhh-srv-olatweb.rrz.uni-hamburg.de/olat/dmz/
+
+ */

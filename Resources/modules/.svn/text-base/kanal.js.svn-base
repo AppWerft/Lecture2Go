@@ -1,0 +1,60 @@
+exports.create = function(kanal) {
+	var w = Ti.Platform.displayCaps.platformWidth;
+	var self = require('/modules/l2g').create({
+		title : kanal.label,
+		message : 'Besorge Videos des Kanales …',
+		back : true
+	});
+	self.rightbutton.kanal = kanal;
+	self.rightbutton.addEventListener('click', function(event) {
+		var kanal = event.source.kanal;
+		var dialog = Ti.UI.createAlertDialog({
+			cancel : 1,
+			buttonNames : ['Ja', 'Abbruch'],
+			message : 'Möchtest Du diesen Kanal abonieren?',
+			title : 'Abo'
+		});
+		dialog.addEventListener('click', function(e) {
+			if (e.index === e.source.cancel) {
+				return;
+			}
+			Ti.App.Model.setFav(kanal);
+			self.rightbutton.hide();
+		});
+		dialog.show();
+	});
+	self.playlist = Ti.UI.createTableView({
+		top : w / 6,
+		backgroundColor : 'transparent'
+	});
+	self.add(self.playlist);
+	/* liefert alle Filme  eines Kanals */
+	Ti.App.Model.getMoviesByChannel(kanal.id, function(res) {
+		if (Ti.App.Model.isFav(res.nr) == 0) {
+			self.rightbutton.animate(Ti.UI.createAnimation({
+				opacity : 1
+			}));
+
+		}
+		for (var i = 0; i < res.playlist.length; i++) {
+			var row = require('/modules/videorow').create(res.playlist[i]);
+			self.playlist.appendRow(row);
+		}
+	});
+	self.playlist.addEventListener('click', function(_e) {
+		var vidWin = require('/modules/videowin').create(_e.row.movie);
+		self.tab.open(vidWin);
+	});
+	self.playlist.addEventListener('swipe', function(_e) {
+		if (_e.direction == 'right')
+			self.close({
+				animated : true
+			});
+	});
+	self.addEventListener('focus', function() {
+		Ti.App.fireEvent('tab1_changed', {
+			label : 'Videos'
+		})
+	});
+	return self;
+}
