@@ -1,0 +1,6 @@
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/ApplicationStylesheet.java"
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/AssetCryptImpl.java"
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/Lecture2goActivity.java"
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/Lecture2goAppInfo.java"
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/Lecture2goApplication.java"
+"/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go/build/android/gen/de/appwerft/l2g/R.java"

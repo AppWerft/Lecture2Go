@@ -9,7 +9,7 @@
         <target device="android">true</target>
         <target device="blackberry">false</target>
     </deployment-targets>
-    <sdk-version>3.2.0.v20130609160053</sdk-version>
+    <sdk-version>3.2.0.GA</sdk-version>
     <id>de.appwerft.l2g</id>
     <name>lecture2go</name>
     <version>1.0</version>
@@ -29,7 +29,7 @@
     <property name="facebook.appid" type="string">202972656504444</property>
     <property name="twitter.appid" type="string">TLKuHP7KycTmx9rmAzn1g</property>
     <property name="twitter.appsecret" type="string">mTAPXa74Ak9hCGyuCZOqJtZ7ZPj8m1wIB9WdgF9y80</property>
-    <property name="dbmirror" type="string">http://lab.min.uni-hamburg.de/l2g/lecture2go.sql</property>
+    <property name="dbmirrorurl" type="string">http://lecture2go2.rrz.uni-hamburg.de/appdb/</property>
     <iphone>
         <orientations device="iphone">
             <orientation>Ti.UI.PORTRAIT</orientation>
@@ -37,12 +37,19 @@
         </orientations>
     </iphone>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
+        <tool-api-level>14</tool-api-level>
         <manifest>
+            <uses-sdk targetSdkVersion="14"/>
             <application>
                 <activity android:configChanges="keyboardHidden"
                     android:label=""
                     android:name="ti.modules.titanium.media.TiVideoActivity"
                     android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+                <activity android:configChanges="keyboardHidden"
+                    android:label=""
+                    android:name="ti.modules.titanium.ui.TiTabActivity"
+                    android:screenOrientation="portrait" 
+                    android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
             </application>
         </manifest>
     </android>
@@ -64,9 +71,9 @@
         <module platform="iphone">net.iamyellow.tiws</module>
         <module platform="iphone">com.obscure.ticarousel</module>
         <module platform="iphone">ti.compression</module>
-        <module platform="iphone" version="1.0">path.animator</module>
         <module platform="android">facebook</module>
         <module platform="iphone">facebook</module>
+        <module platform="android">com.alcoapps.actionbarextras</module>
     </modules>
     <property name="ti.deploytype">test</property>
 </ti:app>

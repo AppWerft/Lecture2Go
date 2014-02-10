@@ -64,4 +64,4 @@ exports.create = function() {
 	 });
 	 */
 	return self;
-}
+};

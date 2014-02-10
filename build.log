@@ -522,3 +522,9 @@ Logfile initialized
 [DEBUG] installing native lib: /Users/fuerst/Library/Application Support/Titanium/modules/android/facebook/3.0.1/libs/armeabi-v7a/libfacebook.so
 [DEBUG] installing native lib: /Users/fuerst/Library/Application Support/Titanium/modules/android/facebook/3.0.1/libs/x86/libfacebook.so
 [DEBUG] installing native SDK libs
+[DEBUG] Waiting for device to be ready ...
+[TRACE] adb devices returned 1 devices/emulators
+[DEBUG] Device connected... (waited 0 seconds)
+[DEBUG] waited 0.024687 seconds on emulator to get ready
+[INFO] Installing application on device
+[INFO] Application installed. Launch from drawer on Home Screen

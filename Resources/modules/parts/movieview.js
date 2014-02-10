@@ -62,4 +62,4 @@ exports.create = function(_video, _i) {
 	}));
 
 	return self;
-}
+};
