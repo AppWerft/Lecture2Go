@@ -1,34 +1,29 @@
 exports.create = function() {
 	console.log('Info: Starting introwindow');
 	var self = Ti.UI.createWindow({
-		backgroundColor : '#fff',
+		fullscreen : true,
+		backgroundImage : '/assets/default.png',
+		navBarHidden : true
 	});
-	var container = Ti.UI.createView({
-		backgroundImage : '/Default.png',
-		width : Ti.UI.FILL,
-		height : Ti.UI.FILL,
-	});
-	self.add(container);
-	self.progress = Ti.UI.createProgressBar({
-		bottom : '40dip',
-		width : '80%',
-		height : '40dip',
-		message : 'Bitte etwas Geduld …',
-		min : 0,
-		max : 1,
-		value : 0
-	});
-	self.progress.show();
-	container.add(self.progress);
+	self.progressview = require('ui/progress.widget').create();
+	self.add(self.progressview);
+	self.progressview.show();
+	self.progressview.setTitle('Lecture2Go – Datenabgleich mit Videoserver');
 	console.log('Info: introwindow progress added and shown');
-	Ti.App.Model.initVideoDB({
-		progress : self.progress,
+	Ti.App.Lecture2Go.initVideoDB({
+		onprogress : function(_p) {
+			self.progressview.setProgress(_p);
+		},
+		onstatuschanged : function(_status) {
+			console.log('Info: Message from Mirror = ' + _status.text);
+			self.progressview.setMessage(_status.text);
+		},
 		onload : function(_result) {
 			if (_result) {
 				setTimeout(function() {
 					console.log('Info: end of intro animiation');
 					Ti.Media.vibrate();
-					self.fireEvent('ready', {});
+					Ti.App.fireEvent('app:ready', {});
 				}, 300);
 			}
 		}

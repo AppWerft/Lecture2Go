@@ -1,8 +1,5 @@
 exports.create = function(_video) {
-	var self = require('modules/l2g').create({
-		title : _video.title,
-		back : false,
-	});
+	var self = require('modules/l2g').create();
 	self.backgroundColor = 'white';
 	var poster = Ti.UI.createImageView({
 		image : _video.image,

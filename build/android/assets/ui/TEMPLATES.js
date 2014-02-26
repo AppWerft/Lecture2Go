@@ -1,7 +1,7 @@
 exports.videorow = {
 	properties : {
 		height : Ti.UI.SIZE,
-		backgroundColor : 'white'
+		backgroundColor : 'black'
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',
@@ -10,22 +10,21 @@ exports.videorow = {
 			height : '55dp',
 			width : '90dp',
 			left : 0,
-			top : 0,
-			defaultImage : '/assets/logo.png'
+			top : '5dp',
+			defaultImage : '/assets/l2g.png'
 		}
 	}, {
 		type : 'Ti.UI.Label',
 		bindId : 'duration',
 		properties : {
-			color : '#666',
+			color : '#ddd',
 			height : '16dp',
 			font : {
-				fontSize : '13dp',
-				fontWeight : 'bold',
+				fontSize : '10dp',
 				fontFamily : 'TheSans-B7Bold'
 			},
 			left : 5,
-			text : '01.06.2013',
+			text : '____',
 			width : Ti.UI.FILL,
 			bottom : 1,
 
@@ -37,14 +36,14 @@ exports.videorow = {
 			width : Ti.UI.FILL,
 			height : Ti.UI.SIZE,
 			left : '100dp',
-			backgroundColor : 'white',
+			right : '20dp',
 			layout : 'vertical'
 		},
 		childTemplates : [{
 			type : 'Ti.UI.Label',
 			bindId : 'title',
 			properties : {
-				color : '#222',
+				color : '#F17B0D',
 				height : Ti.UI.SIZE,
 				font : {
 					fontSize : '16dp',
@@ -61,7 +60,7 @@ exports.videorow = {
 			type : 'Ti.UI.Label',
 			bindId : 'subtitle',
 			properties : {
-				color : '#666',
+				color : '#ccc',
 				height : '20dp',
 				font : {
 					fontSize : '13dp',
@@ -76,6 +75,7 @@ exports.videorow = {
 		}]
 	}]
 };
+
 exports.firstvideorow = {
 	properties : {
 		height : '200dp'

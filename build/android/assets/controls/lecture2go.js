@@ -1,40 +1,56 @@
 const VIDEOSTORAGENAME = 'VideoStorage';
-const DBNAME = 'lecture2go';
+var DBNAME = null;
 const WOWZA_URL = 'http://fms1.rrz.uni-hamburg.de';
-const L2G_URL = 'http://fms1.rrz.uni-hamburg.de';
-const SELECT = 'SELECT v.treeid einrichtungId, v.dimension, v.filename, v.filesize,v.duration,v.title title,v.hits,v.author,v.publisher,v.id id,c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, channels c';
+const L2G_URL = 'https://lecture2go.uni-hamburg.de';
+const SELECT = 'SELECT v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id,c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, channels c';
 
 var Model = function() {
 	console.log('Info: Start l2g-model');
 	this.getVideosFromSQL = function(sql) {
-		var _result = this.videoDB.execute(sql);
+		var link = Ti.Database.open(DBNAME);
+		var _result = link.execute(sql);
 		var videos = [];
 		while (_result.isValidRow()) {
-			var dimensions = _result.fieldByName('dimension').split('x');
-			var idstr = _result.fieldByName('filename').replace(/\.mp4/, '');
-			videos.push({
-				ratio : (dimensions[1]) ? dimensions[0] / dimensions[1] : 1,
-				title : _result.fieldByName('title'),
-				hits : _result.fieldByName('hits'),
-				author : _result.fieldByName('author'),
-				publisher : _result.fieldByName('publisher'),
-				id : _result.fieldByName('id'),
-				filename : _result.fieldByName('filename'),
-				channel : {
-					id : _result.fieldByName('channelid'),
-					lang : _result.fieldByName('lang'),
-					nr : _result.fieldByName('nr'),
-					name : _result.fieldByName('channelname')
-				},
-				filesize : _result.fieldByName('filesize'),
-				duration : _result.fieldByName('duration'),
-				stream : WOWZA_URL + '/vod/_definst_/mp4:' + _result.fieldByName('einrichtungId') + 'l2g' + _result.fieldByName('produzentId') + '/' + idstr + '/playlist.m3u8',
-				image : L2G_URL + '/images/' + idstr + '.jpg',
-				mp4 : WOWZA_URL + '/abo/' + idstr + '.mp4'
-			});
+			if (_result.fieldByName('resolution') && _result.fieldByName('duration')) {
+				var resolution = _result.fieldByName('resolution');
+				var regex = /^([\d]+)x([\d]+)/g;
+				var ratio = regex.exec(resolution);
+				var idstr = _result.fieldByName('filename').replace(/\.mp4/, '');
+				var duration = _result.fieldByName('duration').replace(/\.([\d]+)/, '');
+				var moment = require('vendor/moment');
+				moment.lang('de_DE');
+				var video = {
+					ctime : _result.fieldByName('ctime'),
+					'duration_min' : parseInt(duration.split(':')[0])*60 + parseInt(duration.split(':')[1]), 
+					'ctime_i18n' : moment(_result.fieldByName('ctime'),'YYYY-MM-DD_HH-mm').format('LLLL'),
+					day : _result.fieldByName('ctime').split('_')[0],
+					ratio : (ratio) ? ratio[2] / ratio[1] : 1,
+					title : _result.fieldByName('title'),
+					hits : _result.fieldByName('hits'),
+					author : _result.fieldByName('author'),
+					publisher : _result.fieldByName('publisher'),
+					pathpart : _result.fieldByName('pathpart'),
+					id : _result.fieldByName('id'),
+					ctime : _result.fieldByName('ctime'),
+					filename : _result.fieldByName('filename'),
+					channel : {
+						id : _result.fieldByName('channelid'),
+						lang : _result.fieldByName('lang'),
+						nr : _result.fieldByName('nr'),
+						name : _result.fieldByName('channelname')
+					},
+					duration : duration,
+					stream : WOWZA_URL + '/vod/_definst_/mp4:' + _result.fieldByName('einrichtungId') + 'l2g' + _result.fieldByName('produzentId') + '/' + idstr + '/playlist.m3u8',
+					thumb : L2G_URL + '/images/' + idstr + '_m.jpg',
+					image : L2G_URL + '/images/' + idstr + '.jpg',
+					mp4 : WOWZA_URL + '/abo/' + idstr + '.mp4'
+				};
+				videos.push(video);
+			}
 			_result.next();
 		}
 		_result.close();
+		link.close();
 		return videos;
 	};
 	if (!Ti.App.Properties.hasProperty('menuemodus'))
@@ -57,15 +73,20 @@ var Model = function() {
 Model.prototype.initVideoDB = function() {
 	var options = arguments[0] || {};
 	var dbname = null;
-	var old_mtime = 0, new_mtime = 0;
+	var old_mtime = null, new_mtime = null;
 	if (Ti.App.Properties.hasProperty('old_mtime')) {
 		old_mtime = Ti.App.Properties.getString('old_mtime');
-		console.log('Info: old_mtime from properties: ' + old_mtime);
+		options.onstatuschanged({
+			text : 'alte Version vom ' + old_mtime + ' gefunden.'
+		});
 	}
 	var xhr = Ti.Network.createHTTPClient({
 		onerror : function() {
 			options.onload({
 				success : false
+			});
+			options.onstatuschanged({
+				text : 'Internetproblem.'
 			});
 		},
 		onload : function() {
@@ -73,17 +94,19 @@ Model.prototype.initVideoDB = function() {
 			try {
 				var res = JSON.parse(this.responseText);
 				new_mtime = res.mtime;
-				Ti.UI.createNotification({
-					message : res['videos_total'] + ' Videos in ' + res['courses_total'] + ' Kursen\nStand: ' + res.mtime
-				}).show();
-				console.log('Info: answer of server valide, new mtime = ' + new_mtime);
+				options.onstatuschanged({
+					text : 'neue Version vom ' + new_mtime + ' auf dem Lecture2Go-Server.'
+				});
 				require('vendor/dataproxy').getDB({
 					url : res.sqlite.url,
 					aspectedcontentlength : res.sqlite.filesize,
-					progress : options.progress,
+					onprogress : options.onprogress,
 					onload : function(_args) {
 						console.log('Info: new database with mtime and tables' + new_mtime + '    ' + _args.numberoftables);
-						dbname = _args.dbname;
+						options.onstatuschanged({
+							text : 'neue Version erfolgreich gespiegelt'
+						});
+						DBNAME = _args.dbname;
 						Ti.App.Properties.setString('old_mtime', new_mtime);
 						Ti.App.Properties.setString('dbname', dbname);
 						console.log('+++++++++++++++++++++++++++++++++++++++++++++++');
@@ -217,7 +240,7 @@ Model.prototype.getImageByChannel = function(_channelid) {
 Model.prototype.getLatestVideofromChannel = function(_channelid) {
 	if (!this.videoDB)
 		this.videoDB = Ti.Database.open(this.DBNAME);
-	var q = 'SELECT filename,title,hits,author,publisher,id FROM videos WHERE channelid=' + _channelid + ' ORDER BY cdate DESC LIMIT 0,1';
+	var q = 'SELECT filename,title,hits,author,publisher,id FROM videos WHERE channelid=' + _channelid + ' ORDER BY generationDate DESC LIMIT 0,1';
 	var result = this.videoDB.execute(q);
 	var videos = [];
 	if (result.isValidRow()) {
@@ -362,30 +385,43 @@ Model.prototype.isFaved = function(_id) {
 	return is;
 };
 
-Model.prototype.getPlaylistById = function(_args) {
-	var q = 'SELECT v.dimension, v.duration, v.filesize, v.filename,v.title,v.hits,v.author,v.publisher,v.id id,c.nr,c.lang,c.id channelid, c.name channelname FROM videos v, channels c ' + 'WHERE c.id=v.channelid AND v.openaccess=1 ' + 'AND c.id =' + _args.id + ' ORDER BY cdate DESC ';
-	_args.onload(this.getVideosFromSQL(q));
+Model.prototype.getVideosByChannel = function(_args) {
+	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND c.id =' + _args.id + ' ORDER BY generationDate DESC ';
+	_args.onload({
+		videos : this.getVideosFromSQL(q)
+	});
 };
 
-Model.prototype.getVideoList = function(_argc) {
-	var offset = (_argc.offset) ? _argc.offset : 0;
-	var limit = (_argc.count) ? _argc.count : 100;
-	if (_argc.modus) {
-		Ti.App.Properties.setString('menuemodus', _argc.modus);
-	}
-	switch (Ti.App.Properties.getString('menuemodus')) {
+Model.prototype.getVideoList = function() {
+	var options = arguments[0] || {};
+	var offset = (options.offset) ? options.offset : 0;
+	var limit = (options.count) ? options.count : 500;
+	switch (options.key) {
 		case 'latest' :
-			var q = SELECT + ' WHERE c.id=v.channelid ORDER BY cdate DESC LIMIT ' + offset + ',' + limit;
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
 			break;
 		case 'popular':
-			var q = SELECT + ' WHERE c.id=v.channelid ORDER BY hits DESC LIMIT ' + offset + ',' + limit;
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY hits DESC LIMIT ' + offset + ',' + limit;
 			break;
+		case 'author':
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.author="'+options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+			break;
+		case 'publisher':
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.publisher="'+options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+			break;
+		case 'day':
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.generationDate LIKE "'+options.value + '%" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+			break;
+		case 'channel':
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.lectureseriesId="'+options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+			break;	
 		default:
 			return;
 	}
-	_argc.onload({
-		videos : this.getVideosFromSQL(q),
-		section : require('modules/menueitems').list[Ti.App.Properties.getString('menuemodus')]
+	console.log(q);
+	options.onload({
+		videos : this.getVideosFromSQL(q)
+		//	section : require('modules/menueitems').list[Ti.App.Properties.getString('menuemodus')]
 	});
 };
 
@@ -413,12 +449,12 @@ Model.prototype.getChannelsByDepartment = function(_args) {
 Model.prototype.search = function(_args) {
 	var needle = _args.needle;
 	var limit = _args.limit || 25;
-	var q = SELECT + ' WHERE c.id=v.channelid AND v.openaccess=1 AND (title LIKE "%' + needle + '%" ' + 'OR author LIKE "%' + needle + '%" ' + 'OR publisher LIKE "%' + needle + '%" ' + ') ORDER BY cdate DESC LIMIT 0,' + limit;
+	var q = SELECT + ' WHERE c.id=v.lectureseriesId   AND (title LIKE "%' + needle + '%" ' + 'OR author LIKE "%' + needle + '%" ' + 'OR publisher LIKE "%' + needle + '%" ' + ') ORDER BY generationDate DESC LIMIT 0,' + limit;
 	_args.onsuccess(this.getVideosFromSQL(q));
 };
 
 Model.prototype.getVideoById = function(_id) {
-	var q = SELECT + ' WHERE c.id=v.channelid AND v.openaccess=1 AND v.id = "' + _id + '"';
+	var q = SELECT + ' WHERE c.id=v.lectureseriesId   AND v.id = "' + _id + '"';
 	console.log(q);
 	return this.getVideosFromSQL(q);
 };

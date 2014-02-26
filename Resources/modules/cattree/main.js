@@ -76,7 +76,7 @@ exports.create = function(title) {
 
 	self.add(self.tv);
 	// Events:
-	Ti.App.Model.getTree({
+	Ti.App.Lecture2Go.getTree({
 		onload : self.updateTableView
 	});
 	self.tv.addEventListener('click', function(_e) {

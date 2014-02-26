@@ -2,13 +2,6 @@
 
 (function() {
 	console.log('Info: Starting App ============================');
-	var fb = require('facebook');
-	console.log(fb);
-	Ti.UI.orientation = Ti.UI.PORTRAIT;
-	if (Ti.Platform.name != 'android') {
-		Ti.App.Social = require('de.marcelpociot.social');
-		Ti.UI.TabBar = require('me.izen.tabbar');
-	}
 	Ti.include('prototypes.js');
 	Ti.App.CONF = {
 		fontsize_title : '16dp',
@@ -18,14 +11,20 @@
 		color_even : '#ddd',
 		color_odd : '#fff'
 	};
-	var modelObj = require('model/lecture2go');
-	Ti.App.Model = new modelObj();
+	Ti.App.Lecture2Go = new (require('controls/lecture2go'))();
+	/*	var introWin = require('ui/intro.window').create();
+	 introWin.open();
+	 introWin.addEventListener('ready', function() {
+	 introWin.close();*/
+	var tabgroup = require('ui/tabgroup').create().open();
 	var introWin = require('ui/intro.window').create();
-	introWin.open();
-	introWin.addEventListener('ready', function() {
-		introWin.close();
-		var tabgroup = require('ui/tabgroup').create().open();
+	introWin.open({
+		animated : false
 	});
+	Ti.App.addEventListener('app:ready', function() {
+		introWin.close();
+	});
+
 })();
 
 /*

@@ -83,6 +83,7 @@ exports.getDB = function(_args) {
 			});
 		}
 	});
+	console.log(_args);
 	xhr.open('GET', _args.url);
 	xhr.send();
 };
