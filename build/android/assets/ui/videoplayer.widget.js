@@ -1,12 +1,19 @@
-exports.create = function(_args) {
-	console.log(_args);
-	if (Ti.Network.online == false || !_args.mp4)
+exports.create = function() {
+	var streaminguris = arguments[0] || {};
+	if (Ti.Network.online == false)
 		return;
-	var url = _args.mp4;
-	var win = Ti.UI.createWindow({
-		backgroundColor : 'white',
-		orientationModes : [Ti.UI.LANDSCAPE_RIGHT, Ti.UI.LANDSCAPE_LEFT]
-	});
+	console.log(streaminguris);
+	if (streaminguris.mp4) {
+		url = streaminguris.mp4;
+		Ti.Android && Ti.UI.createNotification({
+			message : 'Lade MP4 in den Player'
+		}).show();
+	} else {
+		url = streaminguris.rtsp;
+		Ti.Android && Ti.UI.createNotification({
+			message : 'Streame Video mit rtsp'
+		}).show();
+	}
 	var videoplayer = Ti.Media.createVideoPlayer({
 		autoplay : true,
 		fullscreen : true,
@@ -18,14 +25,14 @@ exports.create = function(_args) {
 	videoplayer.addEventListener('playbackstate', function(_e) {
 		console.log(_e.playbackState);
 	});
-	videoplayer.addEventListener('complete', function(e) {
-		if (e.reason == 0) {
-			win.close();
-		};
-	});
-	videoplayer.addEventListener('fullscreen', function(e) {
-		if (e.entering == 0) {
-			win.close();
-		};
-	});
+	/*videoplayer.addEventListener('complete', function(e) {
+	 if (e.reason == 0) {
+	 win.close();
+	 };
+	 });
+	 videoplayer.addEventListener('fullscreen', function(e) {
+	 if (e.entering == 0) {
+	 win.close();
+	 };
+	 });*/
 };

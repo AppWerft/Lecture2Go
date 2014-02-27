@@ -1,5 +1,7 @@
 exports.create = function(_id) {
 	var w = Ti.Platform.displayCaps.platformWidth;
+	var moment = require('vendor/moment');
+	moment.lang('de_DE');
 	var self = require('modules/l2g').create();
 	var metaview = require('ui/videometa.widget');
 	self.container = Ti.UI.createScrollView({
@@ -9,6 +11,10 @@ exports.create = function(_id) {
 	});
 	self.add(self.container);
 	var videodata = Ti.App.Lecture2Go.getVideoById(_id)[0];
+	if (!videodata) {
+		alert('Kein Video gefunden');
+		return self;
+	}
 	self.teasercontainer = Ti.UI.createView({
 		width : Ti.UI.FILL,
 		height : w * videodata.ratio,
@@ -58,12 +64,21 @@ exports.create = function(_id) {
 		label : 'Aufnahmezeit:',
 		value : videodata['ctime_i18n']
 	}));
+	self.container.add(Ti.UI.createLabel({
+		html : videodata.description,
+		top : '5dp',
+		color : '#ddd',
+		left:'10dp',right:'10dp',
+		font : {
+			fontSize : '12dp'
+		}
+	}));
 	self.container.add(require('ui/channel.widget').create({
 		id : videodata.channel.id,
 		title : videodata.channel.name
 	}));
 	self.teasercontainer.addEventListener('click', function() {
-		require('ui/videoplayer.widget').create(videodata);
+		require('ui/videoplayer.widget').create(videodata.videouri);
 	});
 
 	self.addEventListener('open', function() {
@@ -82,8 +97,7 @@ exports.create = function(_id) {
 						itemId : 0,
 						icon : '/assets/paperclip.png'
 					}).addEventListener("click", function() {
-						//	Ti.UI.Android.openPreferences();
-						//e.activity.invalidateOptionsMenu();
+
 					});
 					e.menu.add({
 						title : "Alle Videos des Autors",
@@ -92,7 +106,9 @@ exports.create = function(_id) {
 					}).addEventListener("click", function() {
 						var win = require('ui/videolist.window').create({
 							key : 'author',
-							value : videodata.author
+							value : videodata.author,
+							title : 'Videos des Autors',
+							subtitle : videodata.author
 						});
 						win.open();
 					});
@@ -103,6 +119,8 @@ exports.create = function(_id) {
 					}).addEventListener("click", function() {
 						var win = require('ui/videolist.window').create({
 							key : 'publisher',
+							title : 'Videos des Publishers',
+							subtitle : videodata.publisher,
 							value : videodata.publisher
 						});
 						win.open();
@@ -114,7 +132,9 @@ exports.create = function(_id) {
 					}).addEventListener("click", function() {
 						var win = require('ui/videolist.window').create({
 							key : 'day',
-							value : videodata.day
+							value : videodata.day,
+							title : 'Alle Videos vom',
+							subtitle : moment(videodata.day, 'YYYY-MM-DD').format('dddd, D. MMMM YYYY')
 						});
 						win.open();
 					});
@@ -125,7 +145,9 @@ exports.create = function(_id) {
 					}).addEventListener("click", function() {
 						var win = require('ui/videolist.window').create({
 							key : 'channel',
-							value : videodata.channel.id
+							value : videodata.channel.id,
+							title : 'Videos der gleichen Vorlesungsreihe',
+							subtitle : ''
 						});
 						win.open();
 					});

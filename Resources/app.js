@@ -3,6 +3,7 @@
 (function() {
 	console.log('Info: Starting App ============================');
 	Ti.include('prototypes.js');
+	Ti.UI.backgroundImage='/assets/default.png';
 	Ti.App.CONF = {
 		fontsize_title : '16dp',
 		fontsize_subitle : '12dp',
@@ -12,19 +13,10 @@
 		color_odd : '#fff'
 	};
 	Ti.App.Lecture2Go = new (require('controls/lecture2go'))();
-	/*	var introWin = require('ui/intro.window').create();
-	 introWin.open();
-	 introWin.addEventListener('ready', function() {
-	 introWin.close();*/
 	var tabgroup = require('ui/tabgroup').create().open();
-	var introWin = require('ui/intro.window').create();
-	introWin.open({
+	require('ui/intro.window').create().open({
 		animated : false
 	});
-	Ti.App.addEventListener('app:ready', function() {
-		introWin.close();
-	});
-
 })();
 
 /*

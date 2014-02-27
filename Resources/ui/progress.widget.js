@@ -23,10 +23,10 @@ exports.create = function() {
 	self.title = Ti.UI.createLabel({
 		color : '#F17B0D',
 		top : '5dp',
-		height : '25dp',
+		height : '20dp',
 		width : Ti.UI.FILL,
 		font : {
-			fontSize : '18dp',
+			fontSize : '16dp',
 			fontWeight : 'bold'
 		}
 	});

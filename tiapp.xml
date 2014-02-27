@@ -61,11 +61,9 @@
         <theme>default</theme>
     </mobileweb>
     <modules>
-        <module platform="iphone">de.marcelpociot.social</module>
-        <module platform="android">net.iamyellow.tiws</module>
-        <module platform="iphone">net.iamyellow.tiws</module>
-        <module platform="iphone">ti.compression</module>
         <module platform="android">com.alcoapps.actionbarextras</module>
+        <module platform="android" version="2.3.4">ti.barcode</module>
+        <module platform="iphone">ti.barcode</module>
     </modules>
     <property name="ti.deploytype">test</property>
 </ti:app>

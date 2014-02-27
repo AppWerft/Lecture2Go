@@ -1,54 +1,70 @@
-exports.create = function(_video) {
-	var w = Ti.Platform.displayCaps.platformWidth;
-	
-	var rows = [], carouselViews = [];
-	var self = require('modules/l2g').create({
-		title : 'VideoSuche',
-		back : false,
+exports.create = function() {
+	var options = arguments[0] || {};
+	var self = require('modules/l2g').create();
+	self.listview = Ti.UI.createListView({
+		templates : {
+			'row' : require('ui/TEMPLATES').videorow,
+		},
+		defaultItemTemplate : 'row'
 	});
-	self.scanner = require('modules/parts/scanbutton').create({
-		onsuccess : function(_e) {
-			self.tab.open(require('ui/videoplayer.window').create(_e));
-		}
-	});
-	//self.navbar.add(self.scanner);
-	
-	self.search = Titanium.UI.createSearchBar({
-		barColor : '#000',
-		showCancel : true,
-		height : w / 6,
-		hintText : 'Suchbegriff',
-		top : w / 6,
-	});
-
-	self.add(self.search);
-	self.dummy = Ti.UI.createTableView({
-		search : self.search
-	});
-
-	// Controls :
-	self.search.addEventListener('cancel', function() {
-		self.search.blur();
-	});
-	self.search.addEventListener('focus', function() {
-		self.search.setValue('');
-
-	});
-	self.search.add(self.scanner);
-	self.search.addEventListener('return', function() {
-		carouselViews = [];
-		self.search.blur();
-		Ti.App.Model.search({
-			needle : self.search.value,
-			limit : 50,
-			onsuccess : function(_data) {
-				for (var i = 0; i < _data.length; i++) {
-	//				carouselViews[i] = require('modules/parts/movieview').create(_data[i], i);
+	self.add(self.listview);
+	self.update = function() {
+		Ti.App.Lecture2Go.getLectureseriesByTreeId({
+			id : options.id,
+			onload : function(_data) {
+				var data = [];
+				for (var i = 0; i < _data.lectureseries.length; i++) {
+					var item = {
+						title : {
+							text : _data.lectureseries[i].name
+						},
+						subtitle : {
+							text : _data.lectureseries[i].instructors
+						},
+						thumb : {
+							image : _data.lectureseries[i].thumb
+						},
+						properties : {
+							itemId : JSON.stringify({
+								id : _data.lectureseries[i].lectureseriesid,
+								title : _data.lectureseries[i].name
+							}),
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+						}
+					};
+					data.push(item);
 				}
-				//self.tv.setData(rows);
-	//			self.pagination.setTotal(carouselViews.length);
+				var section = Ti.UI.createListSection();
+				section.setItems(data);
+				self.listview.sections = [section];
 			}
 		});
+	};
+	self.listview.addEventListener('itemclick', function(_e) {
+		var win = require('ui/videolist.window').create({
+			key : 'lectureseries',
+			value : JSON.parse(_e.itemId).id,
+			title : 'Videos der Vorlesungsreihe',
+			subtitle : JSON.parse(_e.itemId).title
+		}).open();
+	});
+	//self.update();
+	self.addEventListener('open', function() {
+		if (Ti.Android) {
+			var activity = self.getActivity();
+			if (activity.actionBar) {
+				var abextras = require('com.alcoapps.actionbarextras');
+				abextras.setExtras({
+					title : 'Vorlesungsreihen',
+					subtitle : options.title,
+					backgroundColor : '#ff4f00'
+				});
+				activity.actionBar.setDisplayHomeAsUp(true);
+				activity.actionBar.onHomeIconItemSelected = function() {
+					self.close();
+				};
+			}
+		}
 	});
 	return self;
 };

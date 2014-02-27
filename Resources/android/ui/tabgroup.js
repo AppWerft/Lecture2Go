@@ -6,19 +6,23 @@ exports.create = function() {
 	});
 	var tabs = [];
 	var taboptions = [{
-		title : 'Neueste Videos',
+		title : 'Neuankömmlinge',
 		window : require('ui/videolist.window').create({
 			key : 'latest'
 		})
 	}, {
-		title : 'Lieblingsvideos',
+		title : 'Straßenfeger',
 		window : require('ui/videolist.window').create({
 			key : 'popular'
 		})
 	}, {
 		icon : 'images/list.png',
-		title : 'Departments',
-		window : require('modules/cattree/main').create('Fakultäten')
+		title : 'Gesamtkatalog',
+		window : require('ui/departmenttree.window').create()
+	}, {
+		title : 'Suchen&Finden',
+		window : require('ui/search.window').create()
+
 	}, {
 		icon : 'images/favorite.png',
 		title : 'Meine Favoriten',
@@ -31,7 +35,6 @@ exports.create = function() {
 		});
 		self.addTab(tabs[i]);
 	}
-	console.log('Info: Ending building tabgroup');
 	self.addEventListener('open', require('ui/actionbar_menu.widget'));
 	return self;
 };

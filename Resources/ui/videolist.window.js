@@ -1,37 +1,26 @@
 exports.create = function() {
 	var options = arguments[0] || {};
-	var RATIO = 16 / 9;
-	var w = Ti.Platform.displayCaps.platformWidth;
 	var self = require('modules/l2g').create();
-	var template = {
-		first : require('ui/TEMPLATES').firstvideorow,
-		even : require('ui/TEMPLATES').videorow,
-		odd : JSON.parse(JSON.stringify(require('ui/TEMPLATES').videorow)),
-	};
-	template.odd.childTemplates[0].properties.backgroundColor = '#ddd';
-	template.odd.childTemplates[0].properties.color = '#222';
-
 	self.listview = Ti.UI.createListView({
 		templates : {
-			'even' : template.even,
-			'odd' : template.odd,
-			'first' : template.first
+			'row' : require('ui/TEMPLATES').videorow
 		},
-		defaultItemTemplate : 'first'
+		defaultItemTemplate : 'row'
 	});
 	self.add(self.listview);
 	self.update = function() {
+		console.log('++++++++++++');
+		console.log(options);
 		Ti.App.Lecture2Go.getVideoList({
 			key : options.key,
 			value : options.value,
 			min : 0,
-			max : 800,
+			max : 150,
 			onload : function(_data) {
+				console.log(_data);
 				var data = [];
 				for (var i = 0; i < _data.videos.length; i++) {
-					template = (i % 2) ? 'odd' : 'even';
 					var item = {
-						template : template,
 						title : {
 							text : _data.videos[i].title
 						},
@@ -66,6 +55,28 @@ exports.create = function() {
 		var win = require('ui/videohomepage.window').create(_e.itemId);
 		win.open();
 	});
-	if (options.value) self.update();
+	console.log('OPTIONDS');
+	console.log(options);
+	if (options.value) {
+		self.update();
+	}	
+	self.addEventListener('open', function() {
+		if (Ti.Android) {
+			var activity = self.getActivity();
+			if (activity.actionBar) {
+				var abextras = require('com.alcoapps.actionbarextras');
+				abextras.setExtras({
+					title : options.title,
+					subtitle : options.subtitle
+				});
+				if (options.value) {
+					activity.actionBar.setDisplayHomeAsUp(true);
+					activity.actionBar.onHomeIconItemSelected = function() {
+						self.close();
+					};
+				}
+			}
+		}
+	});
 	return self;
 };

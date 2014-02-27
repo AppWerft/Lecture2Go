@@ -1,3 +1,51 @@
+exports.treerow = {
+	properties : {
+		height : Ti.UI.SIZE,
+		backgroundColor : 'black'
+	},
+	childTemplates : [{
+		type : 'Ti.UI.View',
+		properties : {
+			layout : 'vertical',
+			top : 0,
+			width : Ti.UI.FILL,
+			height : Ti.UI.SIZE,
+		},
+		childTemplates : [{
+			type : 'Ti.UI.Label',
+			bindId : 'title',
+			properties : {
+				color : '#ddd',
+				top : '10dp',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '16dp',
+					fontWeight : 'bold',
+					fontFamily : 'TheSans-B7Bold'
+				},
+				left : '15dp',
+				right : '20dp',
+				width : Ti.UI.FILL
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'statistic',
+			properties : {
+				color : '#ddd',
+				top : '5dp',
+				bottom: '10dp',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '11dp'
+				},
+				left : '15dp',
+				right : '20dp',
+				width : Ti.UI.FILL
+			}
+		}]
+	}]
+};
+
 exports.videorow = {
 	properties : {
 		height : Ti.UI.SIZE,
@@ -48,7 +96,6 @@ exports.videorow = {
 				font : {
 					fontSize : '16dp',
 					fontWeight : 'bold',
-					//			fontFamily : 'Helvetica'
 				},
 				left : 0,
 				width : Ti.UI.FILL,
@@ -76,24 +123,3 @@ exports.videorow = {
 	}]
 };
 
-exports.firstvideorow = {
-	properties : {
-		height : '200dp'
-	},
-	childTemplates : [{
-		type : 'Ti.UI.View',
-		properties : {
-			width : Ti.UI.FILL,
-		},
-		childTemplates : [{
-			type : 'Ti.UI.ImageView',
-			bindId : 'thumb',
-			properties : {
-				height : Ti.UI.FILL,
-				width : Ti.UI.FILL,
-				defaultImage : '/assets/logo.png'
-			},
-			events : {}
-		}]
-	}]
-};
