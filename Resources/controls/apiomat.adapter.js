@@ -1,5 +1,4 @@
 var Apiomat = require('vendor/apiomat');
-
 var saveCB = {
 	onOk : function() {
 		console.log("saved");
@@ -34,7 +33,8 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 			that.user.loadMyfavorites(undefined, {
 				onOk : function(_favs) {// _favs is undefined ;-(
 					console.log('_favs=' + _favs);
-					that.uservideos.myfavorites = _favs;  // doesn't work
+					that.uservideos.myfavorites = _favs;
+					// doesn't work
 				},
 				onError : function(error) {
 					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
@@ -47,6 +47,11 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 		}
 	});
 	return this;
+};
+
+Lecture2GoWatchedVideo.prototype.watchVideo = function() {
+};
+Lecture2GoWatchedVideo.prototype.localsavedVideo = function() {
 };
 
 Lecture2GoWatchedVideo.prototype.favVideo = function() {
