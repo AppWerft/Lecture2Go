@@ -19,14 +19,20 @@ var Lecture2GoWatchedVideo = function() {
 	Ti.App.Properties.setString('uid', uid);
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
-	this.user.setPassword('88888888');
+	this.user.setPassword('mylittlesecret');
 	Apiomat.Datastore.configure(this.user);
+	Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
+		onOk : function() {
+		},
+		onError : function(err) {
+		}
+	});
 	this.Login();
 	return this;
 };
 
 Lecture2GoWatchedVideo.prototype.Login = function() {
-	
+
 	var that = this;
 	this.user.loadMe({
 		onOk : function() {
