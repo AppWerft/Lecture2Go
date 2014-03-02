@@ -24,10 +24,7 @@ exports.create = function() {
 					self.close({
 						animated : false
 					});
-				}, 3000);
-				Ti.Android && Ti.UI.createNotification({
-					message : 'Besorge Liste der Videos'
-				}).show();
+				}, 30);
 			}
 		});
 

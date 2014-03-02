@@ -6,7 +6,7 @@ exports.create = function(_videodata) {
 		scrollType : 'vertical',
 		width : Ti.UI.FILL,
 	});
-	
+
 	self.videocontainer = Ti.UI.createView({
 		width : Ti.UI.FILL,
 		height : Ti.Platform.displayCaps.platformWidth * _videodata.ratio,
@@ -67,9 +67,21 @@ exports.create = function(_videodata) {
 			fontSize : '12dp'
 		}
 	}));
-	self.add(require('ui/channel.widget').create({
+	self.add(require('ui/videohomepage/channel.widget').create({
 		id : _videodata.channel.id,
 		title : _videodata.channel.name
+	}));
+	var qr = 'http://qrfree.kaywa.com/?l=3&s=20&d=lecture2go%3A%2F%2F' + _videodata.id;
+	self.add(Ti.UI.createWebView({
+		top : '40dp',
+		bottom:'100dp',
+		width : Ti.Platform.displayCaps.platformWidth,
+		height : Ti.Platform.displayCaps.platformWidth,
+		html : '<img src="'+qr+'" width="100%"/>',
+		scalesPageToFit : true,
+		hideLoadIndicator : true,
+		enableZoomControls : false,
+		disableBounce : true
 	}));
 	self.videocontainer.addEventListener('click', function() {
 		require('ui/videohomepage/videoplayer.widget').create(_videodata.videouri);

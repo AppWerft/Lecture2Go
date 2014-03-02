@@ -4,14 +4,6 @@
 	console.log('Info: Starting App ============================');
 	Ti.include('prototypes.js');
 	Ti.UI.backgroundImage='/assets/default.png';
-	/*Ti.App.CONF = {
-		fontsize_title : '16dp',
-		fontsize_subitle : '12dp',
-		padding : '10dp',
-		width_thumb : '80dp',
-		color_even : '#ddd',
-		color_odd : '#fff'
-	};*/
 	Ti.App.Lecture2Go = new (require('controls/lecture2go'))();
 	Ti.App.privateDepot = new (require('controls/privatedepot'))();
 	var tabgroup = require('ui/tabgroup').create().open();

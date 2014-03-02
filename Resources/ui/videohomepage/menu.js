@@ -11,7 +11,7 @@ exports.add = function(_menu, _videodata) {
 				type : "video/mp4",
 				data : _videodata.videouri.mp4
 			});
-			activity.startActivity(intent);
+			Ti.Android.currentActivity.startActivity(intent);
 		});
 	}
 	_menu.add({

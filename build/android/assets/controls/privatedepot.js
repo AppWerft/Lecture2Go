@@ -34,7 +34,6 @@ PrivateDepot.prototype.Login = function() {
 	return this;
 };
 
-// here comes trouble in line +10
 PrivateDepot.prototype.favVideo = function() {
 	var options = arguments[0] || {};
 	var that = this;
@@ -44,9 +43,9 @@ PrivateDepot.prototype.favVideo = function() {
 		onOk : function() {
 			that.myVideoUser.postMyfavorites(myWatchedVideo, {
 				onOk : function() {
-					that.myVideoUser.getMyfavorites( {
+					that.myVideoUser.loadMyfavorites(undefined, {
 						onOk : function(_favs) {
-							console.log(_favs);
+							console.log('_favs=' + _favs);
 						},
 						onError : function(error) {
 							console.log("Some error occured: (" + error.statusCode + ") " + error.message);
