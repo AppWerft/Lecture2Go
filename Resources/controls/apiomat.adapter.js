@@ -3,10 +3,9 @@ var Apiomat = require('vendor/apiomat');
 var saveCB = {
 	onOk : function() {
 		console.log("saved");
-		//Now you can create objects of your class with this new user..
 	},
 	onError : function(error) {
-		console.log("Some error occured: (" + error.statusCode + ")" + error.message);
+		console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 	}
 };
 
@@ -44,7 +43,6 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 			console.log('Info: loadMe() successful');
 		},
 		onError : function(error) {
-			console.log('Info: loadMe gives null => save');
 			that.user.save(saveCB);
 		}
 	});
