@@ -3,7 +3,9 @@ exports.create = function(_id) {
 	var videodata = Ti.App.Lecture2Go.getVideoById({
 		id : _id
 	});
-	self.add(require('ui/videohomepage/widget').create(videodata));
+	setTimeout(function() {
+		self.add(require('ui/videohomepage/widget').create(videodata));
+	}, 50);
 	self.addEventListener('open', function() {
 		if (Ti.Android && self.getActivity()) {
 			self.getActivity().onCreateOptionsMenu = function(e) {

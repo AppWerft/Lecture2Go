@@ -4,9 +4,8 @@ exports.create = function(_videodata) {
 		contentHeight : Ti.UI.SIZE,
 		layout : 'vertical',
 		scrollType : 'vertical',
-		width : Ti.UI.FILL,
+		width : Ti.UI.FILL,showVerticalScrollIndicator :true
 	});
-
 	self.videocontainer = Ti.UI.createView({
 		width : Ti.UI.FILL,
 		height : Ti.Platform.displayCaps.platformWidth * _videodata.ratio,
@@ -77,7 +76,7 @@ exports.create = function(_videodata) {
 		bottom : '100dp',
 		width : Ti.Platform.displayCaps.platformWidth,
 		height : Ti.Platform.displayCaps.platformWidth,
-		html : '<img src="' + qr + '" width="60%"/>',
+		html : '<img src="' + qr + '" width="'+0.88*Ti.Platform.displayCaps.platformWidth+'px"/>',
 		scalesPageToFit : true,
 		backgroundColor : 'black',
 		hideLoadIndicator : true,
