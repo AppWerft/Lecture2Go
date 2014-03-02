@@ -32,15 +32,13 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 			// here I hope to load the datas from user:
 			that.user.loadMyfavorites(undefined, {
 				onOk : function(_favs) {// _favs is undefined ;-(
-					console.log('_favs=' + _favs);
 					that.uservideos.myfavorites = _favs;
-					// doesn't work
+					// doesn't work, favs is undefined
 				},
 				onError : function(error) {
 					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 				}
 			});
-			console.log('Info: loadMe() successful');
 		},
 		onError : function(error) {
 			that.user.save(saveCB);
@@ -67,7 +65,6 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 					// successful => load favorites from apiomat:
 					that.user.loadMyfavorites(undefined, {
 						onOk : function(_favs) {// _favs is undefined ;-(
-							console.log('_favs=' + _favs);
 						},
 						onError : function(error) {
 							console.log("Some error occured: (" + error.statusCode + ") " + error.message);
@@ -75,7 +72,7 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 					});
 				},
 				onError : function(error) {
-					console.log("Some error occured: (" + error.statusCode + ")" + error.message);
+					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 				}
 			});
 		},
