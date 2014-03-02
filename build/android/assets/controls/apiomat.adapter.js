@@ -1,4 +1,5 @@
 var Apiomat = require('vendor/apiomat');
+
 var saveCB = {
 	onOk : function() {
 		console.log("saved");
@@ -9,42 +10,60 @@ var saveCB = {
 	}
 };
 
-var PrivateDepot = function() {
+// Constructor:
+var Lecture2GoWatchedVideo = function() {
+	this.uservideos = {
+		myfavorites : [],
+		mysaved : [],
+		mywatched : []
+	};
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
-	this.myVideoUser = new Apiomat.VideoUser();
-	this.myVideoUser.setUserName(uid);
-	this.myVideoUser.setPassword('88888888');
+	this.user = new Apiomat.VideoUser();
+	this.user.setUserName(uid);
+	this.user.setPassword('88888888');
 	this.Login();
 	return this;
 };
 
-PrivateDepot.prototype.Login = function() {
-	Apiomat.Datastore.configure(this.myVideoUser);
+Lecture2GoWatchedVideo.prototype.Login = function() {
+	Apiomat.Datastore.configure(this.user);
 	var that = this;
-	this.myVideoUser.loadMe({
+	this.user.loadMe({
 		onOk : function() {
+			// here I hope to load the datas from user:
+			that.user.loadMyfavorites(undefined, {
+				onOk : function(_favs) {// _favs is undefined ;-(
+					console.log('_favs=' + _favs);
+					that.uservideos.myfavorites = _favs;  // doesn't work
+				},
+				onError : function(error) {
+					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
+				}
+			});
 			console.log('Info: loadMe() successful');
 		},
 		onError : function(error) {
 			console.log('Info: loadMe gives null => save');
-			that.myVideoUser.save(saveCB);
+			that.user.save(saveCB);
 		}
 	});
 	return this;
 };
 
-PrivateDepot.prototype.favVideo = function() {
+Lecture2GoWatchedVideo.prototype.favVideo = function() {
 	var options = arguments[0] || {};
 	var that = this;
 	var myWatchedVideo = new Apiomat.WatchedVideo();
 	myWatchedVideo.setVideoid(options.id);
 	myWatchedVideo.save({
 		onOk : function() {
-			that.myVideoUser.postMyfavorites(myWatchedVideo, {
+			// add video to user
+			that.user.postMyfavorites(myWatchedVideo, {
 				onOk : function() {
-					that.myVideoUser.loadMyfavorites(undefined, {
-						onOk : function(_favs) {
+					// successful => load favorites from apiomat:
+					that.user.loadMyfavorites(undefined, {
+						onOk : function(_favs) {// _favs is undefined ;-(
 							console.log('_favs=' + _favs);
 						},
 						onError : function(error) {
@@ -63,4 +82,4 @@ PrivateDepot.prototype.favVideo = function() {
 	});
 };
 
-module.exports = PrivateDepot;
+module.exports = Lecture2GoWatchedVideo;
