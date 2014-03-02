@@ -1,12 +1,10 @@
 var Apiomat = require('vendor/apiomat');
-
 var saveCB = {
 	onOk : function() {
 		console.log("saved");
-		//Now you can create objects of your class with this new user..
 	},
 	onError : function(error) {
-		console.log("Some error occured: (" + error.statusCode + ")" + error.message);
+		console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 	}
 };
 
@@ -22,33 +20,37 @@ var Lecture2GoWatchedVideo = function() {
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('88888888');
+	Apiomat.Datastore.configure(this.user);
 	this.Login();
 	return this;
 };
 
 Lecture2GoWatchedVideo.prototype.Login = function() {
-	Apiomat.Datastore.configure(this.user);
+	
 	var that = this;
 	this.user.loadMe({
 		onOk : function() {
 			// here I hope to load the datas from user:
 			that.user.loadMyfavorites(undefined, {
 				onOk : function(_favs) {// _favs is undefined ;-(
-					console.log('_favs=' + _favs);
-					that.uservideos.myfavorites = _favs;  // doesn't work
+					that.uservideos.myfavorites = _favs;
+					// doesn't work, favs is undefined
 				},
 				onError : function(error) {
 					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 				}
 			});
-			console.log('Info: loadMe() successful');
 		},
 		onError : function(error) {
-			console.log('Info: loadMe gives null => save');
 			that.user.save(saveCB);
 		}
 	});
 	return this;
+};
+
+Lecture2GoWatchedVideo.prototype.watchVideo = function() {
+};
+Lecture2GoWatchedVideo.prototype.localsavedVideo = function() {
 };
 
 Lecture2GoWatchedVideo.prototype.favVideo = function() {
@@ -64,7 +66,6 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 					// successful => load favorites from apiomat:
 					that.user.loadMyfavorites(undefined, {
 						onOk : function(_favs) {// _favs is undefined ;-(
-							console.log('_favs=' + _favs);
 						},
 						onError : function(error) {
 							console.log("Some error occured: (" + error.statusCode + ") " + error.message);
@@ -72,7 +73,7 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 					});
 				},
 				onError : function(error) {
-					console.log("Some error occured: (" + error.statusCode + ")" + error.message);
+					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 				}
 			});
 		},

@@ -20,12 +20,13 @@ var Lecture2GoWatchedVideo = function() {
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('88888888');
+	Apiomat.Datastore.configure(this.user);
 	this.Login();
 	return this;
 };
 
 Lecture2GoWatchedVideo.prototype.Login = function() {
-	Apiomat.Datastore.configure(this.user);
+	
 	var that = this;
 	this.user.loadMe({
 		onOk : function() {
