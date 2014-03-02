@@ -74,11 +74,12 @@ exports.create = function(_videodata) {
 	var qr = 'http://qrfree.kaywa.com/?l=3&s=20&d=lecture2go%3A%2F%2F' + _videodata.id;
 	self.add(Ti.UI.createWebView({
 		top : '40dp',
-		bottom:'100dp',
+		bottom : '100dp',
 		width : Ti.Platform.displayCaps.platformWidth,
 		height : Ti.Platform.displayCaps.platformWidth,
-		html : '<img src="'+qr+'" width="100%"/>',
+		html : '<img src="' + qr + '" width="60%"/>',
 		scalesPageToFit : true,
+		backgroundColor : 'black',
 		hideLoadIndicator : true,
 		enableZoomControls : false,
 		disableBounce : true
