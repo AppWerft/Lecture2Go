@@ -36,5 +36,29 @@ exports.create = function() {
 		self.addTab(tabs[i]);
 	}
 	self.addEventListener('open', require('ui/actionbar_menu.widget'));
+	self.addEventListener('androidback', function() {
+		var dialog = Ti.UI.createAlertDialog({
+			cancel : 1,
+			buttonNames : ['Jawohl', 'Nein'],
+			message : 'Mobiles Videoportal „Lecture2Go“\nder Uni Hamburg wirklich beenden?',
+			title : 'Das mögliche Ende'
+		});
+		dialog.addEventListener('click', function(e) {
+			if (e.index === e.source.cancel) {
+				return false;
+			} else {
+				Ti.Android && Ti.UI.createNotification({
+					message : 'Lecture2Go finished'
+				}).show();
+				self.close();
+				setTimeout(function() {
+					Ti.Android.currentActivity.finish();
+					require('bencoding.android.tools').createPlatform().exitApp();
+				}, 1000);
+				return true;
+			}
+		});
+		dialog.show();
+	});
 	return self;
 };

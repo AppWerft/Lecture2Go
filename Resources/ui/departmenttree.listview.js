@@ -5,24 +5,7 @@ exports.create = function(_tree, _hits) {
 		},
 		defaultItemTemplate : 'row'
 	}), sections = [];
-	function getSectionheader(label) {
-		var self = Ti.UI.createView({
-			backgroundColor : '#F17B0D',
-			height : Ti.UI.SIZE
-		});
-		self.add(Ti.UI.createLabel({
-			width : Ti.UI.FILL,
-			left : '10dp',
-			top : '2dp',
-			bottom : '2dp',
-			text : label,
-			font : {
-				fontSize : '12dp'
-			},
-			color : 'black'
-		}));
-		return self;
-	}
+	
 
 	for (var i = 0; i < _tree.length; i++) {
 		var items = [];
@@ -50,7 +33,7 @@ exports.create = function(_tree, _hits) {
 			}
 		}
 		sections[i] = Ti.UI.createListSection({
-			headerView : getSectionheader(_tree[i].name),
+			headerView : require('ui/sectionheader.widget').create(_tree[i].name),
 			items : items
 		});
 	}

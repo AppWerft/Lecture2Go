@@ -3,8 +3,6 @@ exports.create = function() {
 		zIndex : 9999
 	});
 	self.add(Ti.UI.createView({
-		backgroundColor : 'black',
-		opacity : 0.6
 	}));
 	self.add(Ti.UI.createView({
 		backgroundColor : 'black',

@@ -9,15 +9,12 @@ exports.create = function() {
 	});
 	self.add(self.listview);
 	self.update = function() {
-		console.log('++++++++++++');
-		console.log(options);
 		Ti.App.Lecture2Go.getVideoList({
 			key : options.key,
 			value : options.value,
 			min : 0,
 			max : 150,
 			onload : function(_data) {
-				console.log(_data);
 				var data = [];
 				for (var i = 0; i < _data.videos.length; i++) {
 					var item = {
@@ -52,7 +49,7 @@ exports.create = function() {
 		self.update();
 	});
 	self.listview.addEventListener('itemclick', function(_e) {
-		var win = require('ui/videohomepage.window').create(_e.itemId);
+		var win = require('ui/videohomepage/window').create(_e.itemId);
 		win.open();
 	});
 	console.log('OPTIONDS');

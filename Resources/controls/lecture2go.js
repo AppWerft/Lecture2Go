@@ -6,7 +6,7 @@ const L2G_URL = 'https://lecture2go.uni-hamburg.de';
 const SELECT = 'SELECT v.pathpart, v.downloadLink, v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id, v.description, c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, lectureseries c';
 var moment = require('vendor/moment');
 moment.lang('de_DE');
-				
+
 var Model = function() {
 	this.getVideosFromSQL = function(sql) {
 		var link = Ti.Database.open(DBNAME);
@@ -19,7 +19,7 @@ var Model = function() {
 				var ratio = regex.exec(resolution);
 				var idstr = _result.fieldByName('filename').replace(/\.mp4/, '');
 				var duration = _result.fieldByName('duration').replace(/\.([\d]+)/, '');
-				
+
 				var video = {
 					ctime : _result.fieldByName('ctime'),
 					'duration_min' : parseInt(duration.split(':')[0]) * 60 + parseInt(duration.split(':')[1]),
@@ -30,11 +30,12 @@ var Model = function() {
 					hits : _result.fieldByName('hits'),
 					author : _result.fieldByName('author'),
 					publisher : _result.fieldByName('publisher'),
-					description : _result.fieldByName('description'),
+					description : '', //_result.fieldByName('description'),
 					pathpart : _result.fieldByName('pathpart'),
 					id : _result.fieldByName('id'),
 					ctime : _result.fieldByName('ctime'),
 					filename : _result.fieldByName('filename'),
+					downloadlink : _result.fieldByName('downloadLink'),
 					channel : {
 						id : _result.fieldByName('channelid'),
 						lang : _result.fieldByName('lang'),
@@ -359,8 +360,8 @@ Model.prototype.getVideoList = function() {
 		case 'channel':
 		case 'lectureseries':
 			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.lectureseriesId="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
-			
-		break;	
+
+			break;
 		default:
 			return;
 	}
@@ -415,16 +416,19 @@ Model.prototype.getLectureseriesByTreeId = function() {
 		lectureseries : lectureseries
 	});
 };
-Model.prototype.search = function(_args) {
-	var needle = _args.needle;
-	var limit = _args.limit || 25;
-	var q = SELECT + ' WHERE c.id=v.lectureseriesId   AND (title LIKE "%' + needle + '%" ' + 'OR author LIKE "%' + needle + '%" ' + 'OR publisher LIKE "%' + needle + '%" ' + ') ORDER BY generationDate DESC LIMIT 0,' + limit;
-	_args.onsuccess(this.getVideosFromSQL(q));
+
+Model.prototype.searchNeedle = function() {
+	var options = arguments[0] || {};
+	limit = 500;
+	console.log('Info: searching by „' + options.needle + '“');
+	var q = SELECT + ' WHERE c.id=v.lectureseriesId   AND (title LIKE "%' + options.needle + '%" ' + 'OR author LIKE "%' + options.needle + '%" ' + 'OR publisher LIKE "%' + options.needle + '%" ' + ') ORDER BY generationDate DESC LIMIT 0,' + limit;
+	options.onload(this.getVideosFromSQL(q));
 };
 
-Model.prototype.getVideoById = function(_id) {
-	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id = "' + _id + '"';
-	return this.getVideosFromSQL(q);
+Model.prototype.getVideoById = function() {
+	var options = arguments[0] || {};
+	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id = "' + options.id + '"';
+	return this.getVideosFromSQL(q)[0];
 };
 
 module.exports = Model;

@@ -1,7 +1,7 @@
 exports.create = function() {
 	var self = Ti.UI.createWindow({
 		fullscreen : true,
-		backgroundImage : '/assets/default.png',
+	//	backgroundImage : '/assets/default.png',
 		navBarHidden : true
 	});
 	self.progressview = require('ui/progress.widget').create();
@@ -19,7 +19,6 @@ exports.create = function() {
 			onload : function(_result) {
 				if (_result) {
 					Ti.App.fireEvent('app:ready', {});
-					Ti.Media.vibrate();
 				}
 				setTimeout(function() {
 					self.close({
