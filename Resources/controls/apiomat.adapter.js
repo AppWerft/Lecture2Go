@@ -38,8 +38,8 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 		onOk : function() {
 			// here I hope to load the datas from user:
 			that.user.loadMyfavorites(undefined, {
-				onOk : function(_favs) {// _favs is undefined ;-(
-					that.uservideos.myfavorites = _favs;
+				onOk : function() {
+					that.uservideos.myfavorites = that.user.getMyfavorites();
 					// content of that.uservideos is '{"mysaved":[],"mywatched":[]}'#
 					// (myfavorites will deleted by code)
 					console.log(that.uservideos);
@@ -71,15 +71,17 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 		onOk : function() {
 			// add video to user
 			that.user.postMyfavorites(myWatchedVideo, {
-				onOk : function() {
+				onOk : function() {					
 					// successful => load favorites from apiomat:
-					that.user.loadMyfavorites(undefined, {
-						onOk : function(_favs) {// _favs is undefined ;-(
-						},
-						onError : function(error) {
-							console.log("Some error occured: (" + error.statusCode + ") " + error.message);
-						}
-					});
+					/* don't load again, because new video will automatically added to local favorites property */
+					Ti.API.log("Favorites: " + that.user.getMyfavorites());
+					// that.user.loadMyfavorites(undefined, {
+						// onOk : function(_favs) {// _favs is undefined ;-(
+						// },
+						// onError : function(error) {
+							// console.log("Some error occured: (" + error.statusCode + ") " + error.message);
+						// }
+					// });
 				},
 				onError : function(error) {
 					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
