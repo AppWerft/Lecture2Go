@@ -5,7 +5,7 @@
 	Ti.include('prototypes.js');
 	Ti.UI.backgroundImage='/assets/default.png';
 	Ti.App.Lecture2Go = new (require('controls/lecture2go'))();
-	Ti.App.privateDepot = new (require('controls/apiomat.adapter'))();
+	Ti.App.Apiomat = new (require('controls/apiomat.adapter'))();
 	var tabgroup = require('ui/tabgroup').create().open();
 	require('ui/intro.window').create().open({
 		animated : false

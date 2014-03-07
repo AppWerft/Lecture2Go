@@ -45,15 +45,13 @@ exports.create = function() {
 			}
 		});
 	};
-	Ti.App.addEventListener('app:ready', function() {
+	Ti.App.addEventListener('app:lecture2go_ready', function() {
 		self.update();
 	});
 	self.listview.addEventListener('itemclick', function(_e) {
 		var win = require('ui/videohomepage/window').create(_e.itemId);
 		win.open();
 	});
-	console.log('OPTIONDS');
-	console.log(options);
 	if (options.value) {
 		self.update();
 	}	

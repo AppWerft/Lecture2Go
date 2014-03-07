@@ -22,11 +22,10 @@ exports.create = function() {
 	}, {
 		title : 'Suchen&Finden',
 		window : require('ui/search.window').create()
-
 	}, {
 		icon : 'images/favorite.png',
 		title : 'Meine Favoriten',
-		window : Ti.UI.createWindow()//require('modules/favorites/main').create('Merkliste')
+		window : require('ui/myvideolist.window').create()
 	}];
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({

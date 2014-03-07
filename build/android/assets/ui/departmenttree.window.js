@@ -5,7 +5,7 @@ exports.create = function() {
 		showPagingControl : true
 	});
 	self.add(self.container);
-	Ti.App.addEventListener('app:ready', function() {
+	Ti.App.addEventListener('app:lecture2go_ready', function() {
 		Ti.App.Lecture2Go.getTree({
 			onload : function(_sections,_hits) {
 				for (var key in _sections) {

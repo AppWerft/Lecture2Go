@@ -20,7 +20,7 @@ exports.add = function(_menu, _videodata) {
 		itemId : 0,
 		icon : '/assets/paperclip.png'
 	}).addEventListener("click", function() {
-		Ti.App.privateDepot.favVideo({
+		Ti.App.Apiomat.favVideo({
 			id : _videodata.id,
 			onsuccess : function() {
 			}

@@ -18,7 +18,7 @@ exports.create = function() {
 			},
 			onload : function(_result) {
 				if (_result) {
-					Ti.App.fireEvent('app:ready', {});
+					Ti.App.fireEvent('app:lecture2go_ready', {});
 				}
 				setTimeout(function() {
 					self.close({

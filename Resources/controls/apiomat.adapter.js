@@ -12,7 +12,7 @@ var saveCB = {
 var Lecture2GoWatchedVideo = function() {
 	this.uservideos = {
 		myfavorites : [],
-		mysaved : [],
+		mylocalsaved : [],
 		mywatched : []
 	};
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
@@ -38,21 +38,16 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 		onOk : function() {
 			that.user.loadMyfavorites(undefined, {
 				onOk : function() {
-					console.log('Info: loadMyfavorites in loadMe successful');
 					that.uservideos.myfavorites = that.user.getMyfavorites();
-					for (var i = 0; i < that.uservideos.myfavorites.length; i++) {
-						that.uservideos.myfavorites[i].video = Ti.App.Lecture2Go.getVideoById({
-							id : that.uservideos.myfavorites[i].data.videoid
-						});
-					}
-					Ti.App.FireEvent('app:myfavorites', {
-						myfavorites : that.uservideos.myfavorites[i]
-					});
-				},
-				onError : function(error) {
-					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 				}
 			});
+			that.user.loadMylocalsaved(undefined, {
+				onOk : function() {
+					that.uservideos.mylocalsaved = that.user.getMylocalsaved();
+				}
+			});
+			Ti.App.fireEvent('app:apiomatuser_ready');
+			
 		},
 		onError : function(error) {
 			that.user.save(saveCB);
@@ -61,10 +56,16 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 	return this;
 };
 
-Lecture2GoWatchedVideo.prototype.watchVideo = function() {
+Lecture2GoWatchedVideo.prototype.getMe = function(_args, _callbacks) {
+	for (var i = 0; i < this.uservideos.myfavorites.length; i++) {
+		var video = Ti.App.Lecture2Go.getVideoById({
+			id : this.uservideos.myfavorites[i].data.videoid
+		});
+		this.uservideos.myfavorites[i].video = video;
+	}
+	_callbacks.onload && _callbacks.onload(this.uservideos);
 };
-Lecture2GoWatchedVideo.prototype.localsavedVideo = function() {
-};
+
 
 Lecture2GoWatchedVideo.prototype.favVideo = function() {
 	var options = arguments[0] || {};
@@ -73,19 +74,9 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 	myWatchedVideo.setVideoid(options.id);
 	myWatchedVideo.save({
 		onOk : function() {
-			// add video to user
 			that.user.postMyfavorites(myWatchedVideo, {
 				onOk : function() {
-					// successful => load favorites from apiomat:
-					/* don't load again, because new video will automatically added to local favorites property */
 					Ti.API.log("Favorites: " + that.user.getMyfavorites());
-					// that.user.loadMyfavorites(undefined, {
-					// onOk : function(_favs) {// _favs is undefined ;-(
-					// },
-					// onError : function(error) {
-					// console.log("Some error occured: (" + error.statusCode + ") " + error.message);
-					// }
-					// });
 				},
 				onError : function(error) {
 					console.log("Some error occured: (" + error.statusCode + ") " + error.message);

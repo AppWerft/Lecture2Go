@@ -59,7 +59,7 @@ exports.create = function() {
 		});
 	};
 	self.listview.addEventListener('itemclick', function(_e) {
-		var win = require('ui/videohomepage.window').create(_e.itemId).open();
+		var win = require('ui/videohomepage/window').create(_e.itemId).open();
 	});
 	self.addEventListener('open', function() {
 		if (Ti.Android) {
