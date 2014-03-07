@@ -342,6 +342,9 @@ Model.prototype.getVideoList = function() {
 	var offset = (options.min) ? options.min : 0;
 	var limit = (options.max) ? options.max : 150;
 	switch (options.key) {
+		case 'idlist':
+			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id IN (' + options.value.join(',') + ')';
+			break;
 		case 'latest' :
 			var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
 			break;
