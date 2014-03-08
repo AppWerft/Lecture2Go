@@ -1,5 +1,6 @@
 build
 Resources/vendor/apiomat.js
+Resources/vendor/vendor/
 *.php
 .project
 *.apk
