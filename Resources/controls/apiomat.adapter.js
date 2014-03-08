@@ -12,14 +12,16 @@ var saveCB = {
 // Constructor:
 var ApiomatAdapter = function() {
 	// Following method produced error (file not found stuff)
-	/*try {
-		Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, saveCB);
-	} catch(E) {
-		console.log(E);
-	}*/
+/*	Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
+		onOk : function() {
+			//Cache is initalized
+		},
+		onError : function(err) {
+			//Error occurred
+		}
+	});*/
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
-	this.myfavorites = [];
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('mylittlesecret');
@@ -35,9 +37,9 @@ ApiomatAdapter.prototype.loginUser = function() {
 		onOk : function() {
 			that.user.loadMyfavorites("order by createdAt", {
 				onOk : function() {
-					that.myfavorites = that.user.getMyfavorites();
+					var myfavorites = that.user.getMyfavorites();
 					Ti.UI.createNotification({
-						message : that.myfavorites.length + ' Favoriten geladen.'
+						message : myfavorites.length + ' Favoriten geladen.'
 					}).show();
 
 				},
@@ -59,10 +61,11 @@ ApiomatAdapter.prototype.loginUser = function() {
 };
 
 ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
+	var myfavorites = this.user.getMyfavorites();
 	console.log('Info: this.getStatusofVideo()');
 	var faved = localsaved = watched = false;
-	for (var i = 0; i < this.myfavorites.length; i++) {
-		if (this.myfavorites[i].data.videoid == _id) {
+	for (var i = 0; i < myfavorites.length; i++) {
+		if (myfavorites[i].data.videoid == _id) {
 			faved = true;
 			break;
 		}
@@ -75,11 +78,11 @@ ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
 };
 
 ApiomatAdapter.prototype.getMe = function(_args, _callbacks) {
-	console.log(this.myfavorites);
-	for (var i = 0; i < this.myfavorites.length; i++) {
-		this.myfavorites[i].video = JSON.parse(this.myfavorites[i].data.video);
+	var myfavorites = this.user.getMyfavorites();
+	for (var i = 0; i < myfavorites.length; i++) {
+		myfavorites[i].video = JSON.parse(myfavorites[i].data.video);
 	}
-	_callbacks.onload && _callbacks.onload(this.myfavorites);
+	_callbacks.onload && _callbacks.onload(myfavorites);
 };
 
 ApiomatAdapter.prototype.favVideo = function() {
