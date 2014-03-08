@@ -4,8 +4,10 @@
 	console.log('Info: Starting App ============================');
 	Ti.include('prototypes.js');
 	Ti.UI.backgroundImage='/assets/default.png';
-	Ti.App.Lecture2Go = new (require('controls/lecture2go'))();
-	Ti.App.Apiomat = new (require('controls/apiomat.adapter'))();
+	var Lecture2GoAdapter = require('controls/lecture2go');
+	var ApiomatAdapter = require('controls/apiomat.adapter');
+	Ti.App.Lecture2Go = new Lecture2GoAdapter();
+	Ti.App.Apiomat = new ApiomatAdapter();
 	var tabgroup = require('ui/tabgroup').create().open();
 	require('ui/intro.window').create().open({
 		animated : false

@@ -108,7 +108,7 @@ Apiomat.User = function() {
 Apiomat.User.AOMBASEURL = "https://apiomat.org/yambas/rest/apps/lecture2go";
 Apiomat.User.AOMAPIKEY = "7597029286098615760";
 Apiomat.User.AOMSYS = "LIVE";
-Apiomat.User.AOMSDKVERSION = "1.10-87";
+Apiomat.User.AOMSDKVERSION = "1.10-93";
 /* static methods */
 
 /**
@@ -155,7 +155,6 @@ Apiomat.User.prototype.setPassword = function(_password) {
     this.data.password = _password;
 };
 
-
         Apiomat.User.prototype.getLastName = function() 
 {
     return this.data.lastName;
@@ -164,6 +163,7 @@ Apiomat.User.prototype.setPassword = function(_password) {
 Apiomat.User.prototype.setLastName = function(_lastName) {
     this.data.lastName = _lastName;
 };
+
 
         Apiomat.User.prototype.getFirstName = function() 
 {

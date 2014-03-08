@@ -108,7 +108,7 @@ Apiomat.MemberModel = function() {
 Apiomat.MemberModel.AOMBASEURL = "https://apiomat.org/yambas/rest/apps/lecture2go";
 Apiomat.MemberModel.AOMAPIKEY = "7597029286098615760";
 Apiomat.MemberModel.AOMSYS = "LIVE";
-Apiomat.MemberModel.AOMSDKVERSION = "1.10-87";
+Apiomat.MemberModel.AOMSDKVERSION = "1.10-93";
 /* static methods */
 
 /**

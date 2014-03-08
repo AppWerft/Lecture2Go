@@ -41,84 +41,6 @@ if(typeof exports === 'undefined')
 Apiomat.WatchedVideo = function() {
     this.data = new Object();
     /* referenced object methods */
-    
-    var videouser = undefined;
-    
-    this.getVideouser = function() 
-    {
-        return videouser;
-    };
-    
-    this.loadVideouser = function(callback) 
-    {
-        var refUrl = this.data.videouserHref;
-        Apiomat.Datastore.getInstance().loadFromServer(refUrl, {
-            onOk : function(obj) {
-                videouser = obj;
-                callback.onOk();
-            },
-            onError : function(error) {
-                callback.onError(error);
-            }
-        }, undefined, undefined, Apiomat.VideoUser);
-    };
-    
-    this.postVideouser = function(_refData, _callback) 
-    {
-        if(_refData == false || typeof _refData.getHref() === 'undefined') {
-            var error = new Apiomat.ApiomatRequestError(Apiomat.Status.SAVE_REFERENECE_BEFORE_REFERENCING);
-            if (_callback && _callback.onError) {
-                    _callback.onError(error);
-            } else if(console && console.log) {
-                    console.log("Error occured: " + error);
-            }
-            return;
-        }
-        var callback = {
-            onOk : function(refHref) {
-                if (refHref) {
-                                    videouser = _refData;
-                                }
-                if (_callback && _callback.onOk) {
-                    _callback.onOk();
-                }
-            },
-            onError : function(error) {
-                if (_callback && _callback.onError) {
-                    _callback.onError(error);
-                }
-            }
-        };
-         if(Apiomat.Datastore.getInstance().shouldSendOffline("POST"))
-        {
-            Apiomat.Datastore.getInstance( ).sendOffline( "POST", this.getHref(), _refData, "videouser", callback );
-        }
-        else
-        {
-            Apiomat.Datastore.getInstance().postOnServer(_refData, callback, this.data.videouserHref);
-        }
-    };
-    
-    this.removeVideouser = function(_refData, _callback) 
-    {
-        var id = _refData.getHref().substring(_refData.getHref().lastIndexOf("/") + 1);
-        var deleteHref = this.data.videouserHref + "/" + id;
-        var callback = {
-            onOk : function(obj) {
-                            videouser = undefined
-            ;                 
-                if (_callback && _callback.onOk) {
-                    _callback.onOk();
-                }
-            },
-            onError : function(error) {
-                if (_callback && _callback.onError) {
-                    _callback.onError(error);
-                }
-            }
-        };
-        Apiomat.Datastore.getInstance().deleteOnServer(deleteHref, callback);
-    };    
 };
 /* static methods */
 
@@ -158,13 +80,13 @@ Apiomat.WatchedVideo.prototype.setVideoid = function(_videoid) {
     this.data.videoid = _videoid;
 };
 
-        Apiomat.WatchedVideo.prototype.getVideouser = function() 
+        Apiomat.WatchedVideo.prototype.getVideo = function() 
 {
-    return this.data.videouser;
+    return this.data.video;
 };
 
-Apiomat.WatchedVideo.prototype.setVideouser = function(_videouser) {
-    this.data.videouser = _videouser;
+Apiomat.WatchedVideo.prototype.setVideo = function(_video) {
+    this.data.video = _video;
 };
 
         Apiomat.WatchedVideo.prototype.getLastposition = function() 

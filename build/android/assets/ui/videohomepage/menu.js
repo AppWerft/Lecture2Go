@@ -1,4 +1,7 @@
 exports.add = function(_menu, _videodata) {
+	console.log(Ti.App.Apiomat);
+	var status = Ti.App.Apiomat.getStatusofVideo(_videodata.id);
+	console.log(status);
 	if (_videodata.downloadlink) {
 		_menu.add({
 			title : "Sharing",
@@ -17,19 +20,33 @@ exports.add = function(_menu, _videodata) {
 	_menu.add({
 		title : "Vormerken",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
-		itemId : 0,
+		itemId : 1,
+		visible : (status.faved) ? false : true,
 		icon : '/assets/paperclip.png'
-	}).addEventListener("click", function() {
+	}).addEventListener("click", function(_e) {
+		console.log(_e);
+		_e.source.visible = false;
+
 		Ti.App.Apiomat.favVideo({
-			id : _videodata.id,
+			video : _videodata,
 			onsuccess : function() {
+				Ti.Media.vibrate();
 			}
 		});
 	});
 	_menu.add({
+		title : "Mitnehmen",
+		showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+		itemId : 2,
+		visible : (status.localsaved || !status.faved || !_videodata.downloadlink) ? false : true,
+		icon : '/assets/download.png'
+	}).addEventListener("click", function() {
+
+	});
+	_menu.add({
 		title : "Alle Videos des Autors",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-		itemId : 0
+		itemId : 3
 	}).addEventListener("click", function() {
 		var win = require('ui/videolist.window').create({
 			key : 'author',
@@ -42,7 +59,7 @@ exports.add = function(_menu, _videodata) {
 	_menu.add({
 		title : "Alle Videos des Publishers",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-		itemId : 1
+		itemId : 4
 	}).addEventListener("click", function() {
 		var win = require('ui/videolist.window').create({
 			key : 'publisher',
@@ -55,7 +72,7 @@ exports.add = function(_menu, _videodata) {
 	_menu.add({
 		title : "Videos des Tages",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-		itemId : 2
+		itemId : 5
 	}).addEventListener("click", function() {
 		var win = require('ui/videolist.window').create({
 			key : 'day',
@@ -68,7 +85,7 @@ exports.add = function(_menu, _videodata) {
 	_menu.add({
 		title : "Vorlesungsreihe",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_NEVER,
-		itemId : 3
+		itemId : 6
 	}).addEventListener("click", function() {
 		var win = require('ui/videolist.window').create({
 			key : 'channel',

@@ -33,6 +33,7 @@ if(typeof goog !== 'undefined')
     goog.require('Apiomat.User');
     goog.require('Apiomat.WatchedVideo');
     goog.require('Apiomat.WatchedVideo');
+    goog.require('Apiomat.WatchedVideo');
 }
 if(typeof exports === 'undefined')
 {
@@ -105,6 +106,94 @@ Apiomat.VideoUser = function() {
         }
     };
     /* referenced object methods */
+    
+    var mywatched = [];
+    
+    this.getMywatched = function() 
+    {
+        return mywatched;
+    };
+    
+    this.loadMywatched = function(query,callback) 
+    {
+        var refUrl = this.data.mywatchedHref;
+        Apiomat.Datastore.getInstance().loadFromServer(refUrl, {
+            onOk : function(obj) {
+                mywatched = obj;
+                callback.onOk();
+            },
+            onError : function(error) {
+                callback.onError(error);
+            }
+        }, undefined, query, Apiomat.WatchedVideo);
+    };
+    
+    this.postMywatched = function(_refData, _callback) 
+    {
+        if(_refData == false || typeof _refData.getHref() === 'undefined') {
+            var error = new Apiomat.ApiomatRequestError(Apiomat.Status.SAVE_REFERENECE_BEFORE_REFERENCING);
+            if (_callback && _callback.onError) {
+                    _callback.onError(error);
+            } else if(console && console.log) {
+                    console.log("Error occured: " + error);
+            }
+            return;
+        }
+        var callback = {
+            onOk : function(refHref) {
+                if (refHref) {
+                                    /* only add reference data if not already in local list */
+                    if(mywatched.filter(function(_elem) {
+                        return _elem.getHref() && refHref && _elem.getHref() === refHref;
+                    }).length < 1)
+                    {
+                        mywatched.push(_refData);
+                    } 
+                                }
+                if (_callback && _callback.onOk) {
+                    _callback.onOk();
+                }
+            },
+            onError : function(error) {
+                if (_callback && _callback.onError) {
+                    _callback.onError(error);
+                }
+            }
+        };
+         if(Apiomat.Datastore.getInstance().shouldSendOffline("POST"))
+        {
+            Apiomat.Datastore.getInstance( ).sendOffline( "POST", this.getHref(), _refData, "mywatched", callback );
+        }
+        else
+        {
+            Apiomat.Datastore.getInstance().postOnServer(_refData, callback, this.data.mywatchedHref);
+        }
+    };
+    
+    this.removeMywatched = function(_refData, _callback) 
+    {
+        var id = _refData.getHref().substring(_refData.getHref().lastIndexOf("/") + 1);
+        var deleteHref = this.data.mywatchedHref + "/" + id;
+        var callback = {
+            onOk : function(obj) {
+                            /* Find and remove reference from local list */
+                var i = mywatched.indexOf(_refData);
+                if(i != -1) {
+                    mywatched.splice(i, 1);
+                }
+            ;                 
+                if (_callback && _callback.onOk) {
+                    _callback.onOk();
+                }
+            },
+            onError : function(error) {
+                if (_callback && _callback.onError) {
+                    _callback.onError(error);
+                }
+            }
+        };
+        Apiomat.Datastore.getInstance().deleteOnServer(deleteHref, callback);
+    };    
     
     var mylocalsaved = [];
     
@@ -286,7 +375,7 @@ Apiomat.VideoUser = function() {
 Apiomat.VideoUser.AOMBASEURL = "https://apiomat.org/yambas/rest/apps/lecture2go";
 Apiomat.VideoUser.AOMAPIKEY = "7597029286098615760";
 Apiomat.VideoUser.AOMSYS = "LIVE";
-Apiomat.VideoUser.AOMSDKVERSION = "1.10-87";
+Apiomat.VideoUser.AOMSDKVERSION = "1.10-93";
 /* static methods */
 
 /**
@@ -323,6 +412,15 @@ Apiomat.VideoUser.prototype.getModuleName = function() {
 };
 
 /* easy getter and setter */
+
+        Apiomat.VideoUser.prototype.getMywatched = function() 
+{
+    return this.data.mywatched;
+};
+
+Apiomat.VideoUser.prototype.setMywatched = function(_mywatched) {
+    this.data.mywatched = _mywatched;
+};
 
         Apiomat.VideoUser.prototype.getMylocalsaved = function() 
 {

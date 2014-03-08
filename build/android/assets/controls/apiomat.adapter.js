@@ -9,45 +9,46 @@ var saveCB = {
 };
 
 // Constructor:
-var Lecture2GoWatchedVideo = function() {
-	this.uservideos = {
-		myfavorites : [],
-		mylocalsaved : [],
-		mywatched : []
-	};
+var ApiomatAdapter = function() {
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
+	this.myfavorites = [];
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('mylittlesecret');
 	// Following method produced error (network staff)
 	/*Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
-	 onOk : function() {
-	 },
-	 onError : function(err) {
-	 }
-	 });*/
-	this.Login();
-	return this;
+	onOk : function() {
+	},
+	onError : function(err) {
+	}
+	});*/ // <= das knallt mit file not found Fehler
+	this.loginUser();
+
 };
 
-Lecture2GoWatchedVideo.prototype.Login = function() {
+ApiomatAdapter.prototype.loginUser = function() {
 	var that = this;
 	Apiomat.Datastore.configure(this.user);
 	this.user.loadMe({
 		onOk : function() {
-			that.user.loadMyfavorites(undefined, {
+			that.user.loadMyfavorites("order by createdAt", {
 				onOk : function() {
-					that.uservideos.myfavorites = that.user.getMyfavorites();
+					that.myfavorites = that.user.getMyfavorites();
+					Ti.UI.createNotification({
+						message : that.myfavorites.length + ' Favoriten geladen.'
+					}).show();
+
+				},
+				onError : function(_err) {
+					console.log(_err);
 				}
 			});
 			that.user.loadMylocalsaved(undefined, {
 				onOk : function() {
-					that.uservideos.mylocalsaved = that.user.getMylocalsaved();
 				}
 			});
 			Ti.App.fireEvent('app:apiomatuser_ready');
-			
 		},
 		onError : function(error) {
 			that.user.save(saveCB);
@@ -56,23 +57,37 @@ Lecture2GoWatchedVideo.prototype.Login = function() {
 	return this;
 };
 
-Lecture2GoWatchedVideo.prototype.getMe = function(_args, _callbacks) {
-	for (var i = 0; i < this.uservideos.myfavorites.length; i++) {
-		var video = Ti.App.Lecture2Go.getVideoById({
-			id : this.uservideos.myfavorites[i].data.videoid
-		});
-		this.uservideos.myfavorites[i].video = video;
+ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
+	console.log('Info: this.getStatusofVideo()');
+	var faved = localsaved = watched = false;
+	for (var i = 0; i < this.myfavorites.length; i++) {
+		if (this.myfavorites[i].data.videoid == _id) {
+			faved = true;
+			break;
+		}
 	}
-	_callbacks.onload && _callbacks.onload(this.uservideos);
+	return {
+		faved : faved,
+		localsaved : localsaved,
+		watched : watched
+	};
 };
 
+ApiomatAdapter.prototype.getMe = function(_args, _callbacks) {
+	console.log(this.myfavorites);
+	for (var i = 0; i < this.myfavorites.length; i++) {
+		this.myfavorites[i].video =  JSON.parse(this.myfavorites[i].data.video);
+	}
+	_callbacks.onload && _callbacks.onload(this.myfavorites);
+};
 
-Lecture2GoWatchedVideo.prototype.favVideo = function() {
+ApiomatAdapter.prototype.favVideo = function() {
 	var options = arguments[0] || {};
 	var that = this;
 	var myWatchedVideo = new Apiomat.WatchedVideo();
-	myWatchedVideo.setVideoid(options.id);
-	myWatchedVideo.save({
+    myWatchedVideo.setVideo(JSON.stringify(options.video));
+	myWatchedVideo.setVideoid(options.video. id);
+    myWatchedVideo.save({
 		onOk : function() {
 			that.user.postMyfavorites(myWatchedVideo, {
 				onOk : function() {
@@ -89,4 +104,4 @@ Lecture2GoWatchedVideo.prototype.favVideo = function() {
 	});
 };
 
-module.exports = Lecture2GoWatchedVideo;
+module.exports = ApiomatAdapter;
