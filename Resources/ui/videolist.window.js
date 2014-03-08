@@ -1,5 +1,6 @@
 exports.create = function() {
 	var options = arguments[0] || {};
+	var lectureseriesId = options.value;
 	var self = require('modules/l2g').create();
 	self.listview = Ti.UI.createListView({
 		templates : {
@@ -54,7 +55,7 @@ exports.create = function() {
 	});
 	if (options.value) {
 		self.update();
-	}	
+	}
 	self.addEventListener('open', function() {
 		if (Ti.Android) {
 			var activity = self.getActivity();
@@ -70,6 +71,22 @@ exports.create = function() {
 						self.close();
 					};
 				}
+				if (options.key == 'channel' || options.key == 'lectureseries')
+					activity.onCreateOptionsMenu = function(e) {
+						e.menu.add({
+							title : "Vorlesungsreihe abonnieren",
+							showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+							itemId : 0,
+							icon : '/assets/abo.png'
+						}).addEventListener("click", function() {
+							Ti.App.Apiomat.subscribeChannel({
+								lectureseriesId : lectureseriesId,
+								lectureseries : options.channel
+							}, {});
+							activity.invalidateOptionsMenu();
+						});
+					};
+
 			}
 		}
 	});

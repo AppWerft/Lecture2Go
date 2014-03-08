@@ -27,7 +27,8 @@ exports.create = function() {
 						properties : {
 							itemId : JSON.stringify({
 								id : _data.lectureseries[i].lectureseriesid,
-								title : _data.lectureseries[i].name
+								title : _data.lectureseries[i].name,
+								channel : _data.lectureseries[i]
 							}),
 							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
 						}
@@ -45,7 +46,8 @@ exports.create = function() {
 			key : 'lectureseries',
 			value : JSON.parse(_e.itemId).id,
 			title : 'Videos der Vorlesungsreihe',
-			subtitle : JSON.parse(_e.itemId).title
+			subtitle : JSON.parse(_e.itemId).title,
+			channel : JSON.parse(_e.itemId).channel,
 		}).open();
 	});
 	self.update();

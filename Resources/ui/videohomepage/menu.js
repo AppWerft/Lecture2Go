@@ -1,7 +1,5 @@
 exports.add = function(_menu, _videodata) {
-	console.log(Ti.App.Apiomat);
 	var status = Ti.App.Apiomat.getStatusofVideo(_videodata.id);
-	console.log(status);
 	if (_videodata.downloadlink) {
 		_menu.add({
 			title : "Sharing",
@@ -91,7 +89,8 @@ exports.add = function(_menu, _videodata) {
 			key : 'channel',
 			value : _videodata.channel.id,
 			title : 'Vorlesungsreihe',
-			subtitle : _videodata.channel.name
+			subtitle : _videodata.channel.name,
+			channel : _videodata.channel  // for subsribing of channel=lectureseries
 		});
 		win.open();
 	});

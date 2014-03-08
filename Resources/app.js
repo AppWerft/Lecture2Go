@@ -8,7 +8,9 @@
 	var ApiomatAdapter = require('controls/apiomat.adapter');
 	Ti.App.Lecture2Go = new Lecture2GoAdapter();
 	Ti.App.Apiomat = new ApiomatAdapter();
-	var tabgroup = require('ui/tabgroup').create().open();
+	var tabgroup = require('ui/tabgroup').create();
+	tabgroup.open();
+	tabgroup.setActiveTab(1);
 	require('ui/intro.window').create().open({
 		animated : false
 	});

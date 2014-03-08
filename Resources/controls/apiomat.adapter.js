@@ -48,8 +48,17 @@ ApiomatAdapter.prototype.loginUser = function() {
 					console.log(_err);
 				}
 			});
-			that.user.loadMylocalsaved(undefined, {
+			that.user.loadMysubscribedchannels("order by createdAt", {
 				onOk : function() {
+					var mylectureseries = that.user.getMysubscribedchannels();
+					console.log(mylectureseries);
+					Ti.UI.createNotification({
+						message : mylectureseries.length + ' abonnierte Vorlesungsreihen geladen.'
+					}).show();
+
+				},
+				onError : function(_err) {
+					console.log(_err);
 				}
 			});
 			Ti.App.fireEvent('app:apiomatuser_ready');
@@ -85,6 +94,29 @@ ApiomatAdapter.prototype.getMe = function(_args, _callbacks) {
 	_callbacks.onload && _callbacks.onload(myfavorites);
 };
 
+ApiomatAdapter.prototype.subscribeChannel = function() {
+	var options = arguments[0] || {};
+	var that = this;
+	var lectureseries = new Apiomat.subscribedChannels();
+	lectureseries.setChannel(JSON.stringify(options.lectureseries));
+	lectureseries.setLectureseriesId(options.lectureseriesId);
+	lectureseries.save({
+		onOk : function() {
+			that.user.postMysubscribedchannels(lectureseries, {
+				onOk : function() {
+					console.log('Info: lectureseries ' + options.lectureseriesId + ' angelegt und user zugeordnet');
+				},
+				onError : function(error) {
+					console.log("Some error occured: (" + error.statusCode + ") " + error.message);
+				}
+			});
+		},
+		onError : function(error) {
+			console.log("Some error occured: (" + error.statusCode + ") " + error.message);
+		}
+	});
+};
+
 ApiomatAdapter.prototype.favVideo = function() {
 	var options = arguments[0] || {};
 	var that = this;
@@ -107,5 +139,4 @@ ApiomatAdapter.prototype.favVideo = function() {
 		}
 	});
 };
-
 module.exports = ApiomatAdapter;

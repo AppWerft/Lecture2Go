@@ -6,6 +6,9 @@ exports.create = function() {
 	});
 	var tabs = [];
 	var taboptions = [{
+		title : 'Suchen&Finden',
+		window : require('ui/search.window').create()
+	}, {
 		title : 'Neuankömmlinge',
 		window : require('ui/videolist.window').create({
 			key : 'latest'
@@ -20,12 +23,13 @@ exports.create = function() {
 		title : 'Gesamtkatalog',
 		window : require('ui/departmenttree.window').create()
 	}, {
-		title : 'Suchen&Finden',
-		window : require('ui/search.window').create()
+		icon : 'images/favorite.png',
+		title : 'Meine Lieblingsvideos',
+		window : require('ui/myvideolist.window').create()
 	}, {
 		icon : 'images/favorite.png',
-		title : 'Meine Favoriten',
-		window : require('ui/myvideolist.window').create()
+		title : 'Abonnierte Vorlesungen',
+		window : require('ui/mylectureseries.window').create()
 	}];
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({
@@ -59,5 +63,6 @@ exports.create = function() {
 		});
 		dialog.show();
 	});
+	
 	return self;
 };

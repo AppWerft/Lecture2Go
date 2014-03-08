@@ -8,7 +8,8 @@ var moment = require('vendor/moment');
 moment.lang('de_DE');
 
 var Model = function() {
-	this.getVideosFromSQL = function(sql) {
+	var that = this;
+	this.getVideosFromSQL = function(sql,withthumb) {
 		var link = Ti.Database.open(DBNAME);
 		var _result = link.execute(sql);
 		var videos = [];
@@ -51,6 +52,8 @@ var Model = function() {
 					thumb : L2G_URL + '/images/' + idstr + '_m.jpg',
 					image : L2G_URL + '/images/' + idstr + '.jpg',
 				};
+				if (withthumb) video.channel.thumb =  that.getLatestImageByLectureseries(_result.fieldByName('channelid')).thumb;
+			
 				videos.push(video);
 			}
 			_result.next();
@@ -161,64 +164,63 @@ Model.prototype.initVideoDB = function() {
 };
 
 /*Model.prototype.mirrorRemoteDB = function(_args) {
-	var self = this;
-	function existsDB() {
-		self.videoDB = Ti.Database.open(DBNAME);
-		var result = self.videoDB.execute('SELECT name FROM sqlite_master');
-		if (result.isValidRow()) {
-			return true;
-			result.close();
-		} else
-			return false;
-	}
+ var self = this;
+ function existsDB() {
+ self.videoDB = Ti.Database.open(DBNAME);
+ var result = self.videoDB.execute('SELECT name FROM sqlite_master');
+ if (result.isValidRow()) {
+ return true;
+ result.close();
+ } else
+ return false;
+ }
 
+ console.log('Info: start mirroring DB');
+ var url = Ti.App.Properties.getString('dbmirror');
+ function onOffline() {
+ if (existsDB()) {
+ console.log('Info: offline, but existing old DB');
+ _args.onload(true);
+ } else {
+ console.log('Info: offline and no DB');
+ _args.onload(false);
+ }
+ }
 
-	console.log('Info: start mirroring DB');
-	var url = Ti.App.Properties.getString('dbmirror');
-	function onOffline() {
-		if (existsDB()) {
-			console.log('Info: offline, but existing old DB');
-			_args.onload(true);
-		} else {
-			console.log('Info: offline and no DB');
-			_args.onload(false);
-		}
-	}
-
-	// Decision if mirroring:
-	if (Ti.Network.online == false) {
-		onOffline();
-		return;
-	};
-	var xhr = Ti.Network.createHTTPClient({
-		timeout : (Ti.Network.networkType === Ti.Network.NETWORK_WIFI) ? 2000 : 20000,
-		onerror : onOffline,
-		onload : function() {
-			var filename = DBNAME + '.sql';
-			var tempfile = Ti.Filesystem.getFile(Ti.Filesystem.getTempDirectory(), filename);
-			console.log('Info: Receiving sqlite, length=' + this.responseData.length);
-			console.log('Info: Tempfile created ' + tempfile.nativePath);
-			tempfile.write(this.responseData);
-			try {
-				var dummy = Ti.Database.open(DBNAME);
-				dummy.remove();
-			} catch(E) {
-				onOffline();
-			}
-			self.videoDB = Ti.Database.install(tempfile.nativePath, DBNAME);
-			_args.onload(true);
-		},
-		onsendstream : function(e) {
-		},
-		ondatastream : function(_e) {
-			if (_args.progress)
-				_args.progress.value = _e.progress;
-		}
-	});
-	xhr.open('GET', url);
-	xhr.send(null);
-};
-*/
+ // Decision if mirroring:
+ if (Ti.Network.online == false) {
+ onOffline();
+ return;
+ };
+ var xhr = Ti.Network.createHTTPClient({
+ timeout : (Ti.Network.networkType === Ti.Network.NETWORK_WIFI) ? 2000 : 20000,
+ onerror : onOffline,
+ onload : function() {
+ var filename = DBNAME + '.sql';
+ var tempfile = Ti.Filesystem.getFile(Ti.Filesystem.getTempDirectory(), filename);
+ console.log('Info: Receiving sqlite, length=' + this.responseData.length);
+ console.log('Info: Tempfile created ' + tempfile.nativePath);
+ tempfile.write(this.responseData);
+ try {
+ var dummy = Ti.Database.open(DBNAME);
+ dummy.remove();
+ } catch(E) {
+ onOffline();
+ }
+ self.videoDB = Ti.Database.install(tempfile.nativePath, DBNAME);
+ _args.onload(true);
+ },
+ onsendstream : function(e) {
+ },
+ ondatastream : function(_e) {
+ if (_args.progress)
+ _args.progress.value = _e.progress;
+ }
+ });
+ xhr.open('GET', url);
+ xhr.send(null);
+ };
+ */
 Model.prototype.getTree = function() {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);
@@ -431,7 +433,7 @@ Model.prototype.searchNeedle = function() {
 Model.prototype.getVideoById = function() {
 	var options = arguments[0] || {};
 	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id = "' + options.id + '"';
-	return this.getVideosFromSQL(q)[0];
+	return this.getVideosFromSQL(q,true)[0];
 };
 
 module.exports = Model;

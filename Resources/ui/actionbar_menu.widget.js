@@ -13,7 +13,7 @@ module.exports = function() {
 			itemId : 0,
 			icon : '/assets/search.png'
 		}).addEventListener("click", function() {
-			self.setActiveTab(3);
+			self.setActiveTab(0);
 			activity.invalidateOptionsMenu();
 		});
 		e.menu.add({
@@ -34,5 +34,4 @@ module.exports = function() {
 			require('ui/scan.widget').create();
 		});
 	};
-
 };
