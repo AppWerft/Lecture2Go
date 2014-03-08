@@ -1,0 +1,6 @@
+build
+Resources/vendor/apiomat.js
+*.php
+.project
+*.apk
+tiapp.xml
