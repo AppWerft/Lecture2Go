@@ -160,7 +160,7 @@ Model.prototype.initVideoDB = function() {
 	});
 };
 
-Model.prototype.mirrorRemoteDB = function(_args) {
+/*Model.prototype.mirrorRemoteDB = function(_args) {
 	var self = this;
 	function existsDB() {
 		self.videoDB = Ti.Database.open(DBNAME);
@@ -218,7 +218,7 @@ Model.prototype.mirrorRemoteDB = function(_args) {
 	xhr.open('GET', url);
 	xhr.send(null);
 };
-
+*/
 Model.prototype.getTree = function() {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);

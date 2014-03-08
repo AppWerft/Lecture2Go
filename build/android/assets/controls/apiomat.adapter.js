@@ -1,7 +1,8 @@
 var Apiomat = require('vendor/apiomat');
+
 var saveCB = {
 	onOk : function() {
-		console.log("saved");
+		console.log("OK");
 	},
 	onError : function(error) {
 		console.log("Some error occured: (" + error.statusCode + ") " + error.message);
@@ -10,19 +11,22 @@ var saveCB = {
 
 // Constructor:
 var ApiomatAdapter = function() {
+	var apiomatpersistsfolder = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'apiomatpersists');
+	apiomatpersistsfolder.exists() || apiomatpersistsfolder.createDirectory();
+
+	// Following method produced error (file not found stuff)
+	try {
+		Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, saveCB);
+	} catch(E) {
+		console.log(E);
+	}
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
 	this.myfavorites = [];
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('mylittlesecret');
-	// Following method produced error (network staff)
-	/*Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
-	onOk : function() {
-	},
-	onError : function(err) {
-	}
-	});*/ // <= das knallt mit file not found Fehler
+	// <= das knallt mit file not found Fehler
 	this.loginUser();
 
 };
@@ -76,7 +80,7 @@ ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
 ApiomatAdapter.prototype.getMe = function(_args, _callbacks) {
 	console.log(this.myfavorites);
 	for (var i = 0; i < this.myfavorites.length; i++) {
-		this.myfavorites[i].video =  JSON.parse(this.myfavorites[i].data.video);
+		this.myfavorites[i].video = JSON.parse(this.myfavorites[i].data.video);
 	}
 	_callbacks.onload && _callbacks.onload(this.myfavorites);
 };
@@ -85,9 +89,9 @@ ApiomatAdapter.prototype.favVideo = function() {
 	var options = arguments[0] || {};
 	var that = this;
 	var myWatchedVideo = new Apiomat.WatchedVideo();
-    myWatchedVideo.setVideo(JSON.stringify(options.video));
-	myWatchedVideo.setVideoid(options.video. id);
-    myWatchedVideo.save({
+	myWatchedVideo.setVideo(JSON.stringify(options.video));
+	myWatchedVideo.setVideoid(options.video.id);
+	myWatchedVideo.save({
 		onOk : function() {
 			that.user.postMyfavorites(myWatchedVideo, {
 				onOk : function() {
