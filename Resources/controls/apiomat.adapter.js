@@ -1,27 +1,28 @@
 var Apiomat = require('vendor/apiomat');
+var AssetStorage = require('vendor/asset.storage');
 
 var saveCB = {
 	onOk : function() {
-		console.log("OK");
 	},
 	onError : function(error) {
-		console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 	}
 };
 
 // Constructor:
 var ApiomatAdapter = function() {
 	// Following method produced error (file not found stuff)
-/*	Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
-		onOk : function() {
-			//Cache is initalized
-		},
-		onError : function(err) {
-			//Error occurred
-		}
-	});*/
+	/*	Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
+	 onOk : function() {
+	 //Cache is initalized
+	 },
+	 onError : function(err) {
+	 //Error occurred
+	 }
+	 });*/
+
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
+	this.storage = new AssetStorage();
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('mylittlesecret');
@@ -62,7 +63,6 @@ ApiomatAdapter.prototype.loginUser = function() {
 
 ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
 	var myfavorites = this.user.getMyfavorites();
-	console.log('Info: this.getStatusofVideo()');
 	var faved = localsaved = watched = false;
 	for (var i = 0; i < myfavorites.length; i++) {
 		if (myfavorites[i].data.videoid == _id) {

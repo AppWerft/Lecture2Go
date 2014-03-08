@@ -1,7 +1,6 @@
 exports.create = function() {
 	var options = arguments[0] || {};
 	var self = require('modules/l2g').create();
-	console.log('Start Favs ==============');
 	self.listview = Ti.UI.createListView({
 		templates : {
 			'row' : require('ui/TEMPLATES').videorow
@@ -10,10 +9,6 @@ exports.create = function() {
 	});
 	var sections = [Ti.UI.createListSection({
 		headerTitle : 'Meine Favoriten'
-	}), Ti.UI.createListSection({
-		headerTitle : 'Mitnehmvideos'
-	}), Ti.UI.createListSection({
-		headerTitle : 'Meine letztgesehenen Videos'
 	})];
 	self.add(self.listview);
 	self.updateSections = function() {
@@ -21,7 +16,6 @@ exports.create = function() {
 			return;
 		Ti.App.Apiomat.getMe({}, {
 			onload : function(_listofvideos) {
-				console.log(_listofvideos);
 				if (!_listofvideos)
 					return;
 				var dataitems = [], videoitem;
@@ -60,12 +54,10 @@ exports.create = function() {
 		win.open();
 	});
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
-		console.log('Info: Lecture2go ready ================');
 		self.lecture2goready = true;
 		self.updateSections();
 	});
 	Ti.App.addEventListener('app:apiomatuser_ready', function() {
-		console.log('Info: APIOMAT-user ready ==============');
 		self.apiomatuserready = true;
 		self.updateSections();
 
