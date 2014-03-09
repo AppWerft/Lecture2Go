@@ -71,6 +71,15 @@ Apiomat.WatchedVideo.prototype.getModuleName = function() {
 
 /* easy getter and setter */
 
+        Apiomat.WatchedVideo.prototype.getDevicename = function() 
+{
+    return this.data.devicename;
+};
+
+Apiomat.WatchedVideo.prototype.setDevicename = function(_devicename) {
+    this.data.devicename = _devicename;
+};
+
         Apiomat.WatchedVideo.prototype.getVideoid = function() 
 {
     return this.data.videoid;

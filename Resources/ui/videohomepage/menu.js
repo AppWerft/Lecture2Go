@@ -19,7 +19,7 @@ exports.add = function(_menu, _videodata) {
 		title : "Vormerken",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 		itemId : 1,
-		visible : (status.faved) ? false : true,
+		visible : (status.faved || !_videodata.downloadlink) ? false : true,
 		icon : '/assets/paperclip.png'
 	}).addEventListener("click", function(_e) {
 		console.log(_e);
@@ -90,7 +90,7 @@ exports.add = function(_menu, _videodata) {
 			value : _videodata.channel.id,
 			title : 'Vorlesungsreihe',
 			subtitle : _videodata.channel.name,
-			channel : _videodata.channel  // for subsribing of channel=lectureseries
+			channel : _videodata.channel // for subsribing of channel=lectureseries
 		});
 		win.open();
 	});

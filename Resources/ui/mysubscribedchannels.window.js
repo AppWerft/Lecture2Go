@@ -47,7 +47,13 @@ exports.create = function() {
 		});
 	};
 	self.listview.addEventListener('itemclick', function(_e) {
-		require('ui/videolist.window').create(JSON.parse(_e.itemId)).open();
+		var channel =JSON.parse( _e.itemId);
+		require('ui/videolist.window').create({
+			key : 'channel',
+			value : channel.id,
+			title :'Abonnierte Vorlesungsreihe',
+			subtitle: channel.name,
+		}).open();
 	});
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
 		self.lecture2goready = true;

@@ -31,13 +31,29 @@ var ApiomatAdapter = function() {
 
 };
 
+ApiomatAdapter.prototype.getAllWatchedVideos = function() {
+	console.log('START –––––––––––––––––––––––');
+	Apiomat.WatchedVideo.getWatchedVideos("", {
+		onOk : function(loadedObjs) {
+			console.log('>>>>>>>>>>>>>>>' + loadedObjs);
+			//Now you can do sth with loaded objects (loadedObjs)
+		},
+		onError : function(error) {
+			//handle error
+		}
+	});
+
+};
+
 ApiomatAdapter.prototype.loginUser = function() {
 	var that = this;
 	Apiomat.Datastore.configure(this.user);
+	that.getAllWatchedVideos();
 	this.user.loadMe({
 		onOk : function() {
 			that.user.loadMyfavorites("order by createdAt", {
 				onOk : function() {
+					console.log('User getFav OK');
 					var myfavorites = that.user.getMyfavorites();
 					Ti.UI.createNotification({
 						message : myfavorites.length + ' Favoriten geladen.'
@@ -100,16 +116,14 @@ ApiomatAdapter.prototype.getMyFavorites = function(_args, _callbacks) {
 	var myfavorites = this.user.getMyfavorites();
 	for (var i = 0; i < myfavorites.length; i++) {
 		myfavorites[i].video = JSON.parse(myfavorites[i].data.video);
-		
+
 	}
 	_callbacks.onload && _callbacks.onload(myfavorites);
 };
 
-
 ApiomatAdapter.prototype.getMySubscribedChannels = function(_args, _callbacks) {
 	var mychannels = this.user.getMysubscribedchannels();
 	for (var i = 0; i < mychannels.length; i++) {
-		console.log(mychannels[i]);
 		mychannels[i].channel = JSON.parse(mychannels[i].data.channel);
 	}
 	_callbacks.onload && _callbacks.onload(mychannels);
@@ -138,6 +152,35 @@ ApiomatAdapter.prototype.subscribeChannel = function() {
 		onError : function(error) {
 			console.log("Some error occured: (" + error.statusCode + ") " + error.message);
 		}
+	});
+};
+
+ApiomatAdapter.prototype.setWatchedVideo = function() {
+	var options = arguments[0] || {};
+	var that = this;
+	require('controls/geolocation').get(undefined, function(_coords) {
+		var myWatchedVideo = new Apiomat.WatchedVideo();
+		myWatchedVideo.setVideo(JSON.stringify(options.video));
+		myWatchedVideo.setVideoid(options.video.id);
+		if (_coords) {
+			myWatchedVideo.setLatlngLatitude(_coords.latitude);
+			myWatchedVideo.setLatlngLongitude(_coords.longitude);
+		}
+		myWatchedVideo.save({
+			onOk : function() {
+				that.user.postMywatched(myWatchedVideo, {
+					onOk : function() {
+						Ti.API.log("my watched: " + that.user.getMywatched());
+					},
+					onError : function(error) {
+						console.log("Some error occured: (" + error.statusCode + ") " + error.message);
+					}
+				});
+			},
+			onError : function(error) {
+				console.log(error);
+			}
+		});
 	});
 };
 

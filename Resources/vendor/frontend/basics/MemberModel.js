@@ -193,6 +193,15 @@ Apiomat.MemberModel.prototype.setUserName = function(_userName) {
     this.data.userName = _userName;
 };
 
+        Apiomat.MemberModel.prototype.getRegistrationId = function() 
+{
+    return this.data.dynamicAttributes["registrationId"];
+};
+
+Apiomat.MemberModel.prototype.setRegistrationId = function(_registrationId) {
+    this.data.dynamicAttributes["registrationId"] = _registrationId;
+};
+
    Apiomat.MemberModel.prototype.getLocLatitude = function() 
 {
     var locArr = this.data.loc;
@@ -237,6 +246,15 @@ Apiomat.MemberModel.prototype.setLocLongitude = function(_longitude)
         locArr[1] = _longitude;
     }
     this.data.loc = locArr;
+};
+
+        Apiomat.MemberModel.prototype.getDeviceToken = function() 
+{
+    return this.data.dynamicAttributes["deviceToken"];
+};
+
+Apiomat.MemberModel.prototype.setDeviceToken = function(_deviceToken) {
+    this.data.dynamicAttributes["deviceToken"] = _deviceToken;
 };
 })(typeof exports === 'undefined' ? Apiomat
         : exports);

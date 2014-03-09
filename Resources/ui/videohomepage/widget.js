@@ -84,7 +84,7 @@ exports.create = function(_videodata) {
 		disableBounce : true
 	}));
 	self.videocontainer.addEventListener('click', function() {
-		require('ui/videohomepage/videoplayer.widget').create(_videodata.videouri);
+		require('ui/videohomepage/videoplayer.widget').create(_videodata);
 	});
 	return self;
 };
