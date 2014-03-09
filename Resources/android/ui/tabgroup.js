@@ -30,6 +30,10 @@ exports.create = function() {
 		icon : 'images/favorite.png',
 		title : 'Abonnierte Vorlesungen',
 		window : require('ui/mysubscribedchannels.window').create()
+	}, {
+		icon : 'images/favorite.png',
+		title : 'Live-Karte',
+		window : require('ui/map.window').create()
 	}];
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({

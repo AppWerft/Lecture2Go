@@ -31,12 +31,21 @@ var ApiomatAdapter = function() {
 
 };
 
-ApiomatAdapter.prototype.getAllWatchedVideos = function() {
-	console.log('START –––––––––––––––––––––––');
+ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
 	Apiomat.WatchedVideo.getWatchedVideos("", {
-		onOk : function(loadedObjs) {
-			console.log('>>>>>>>>>>>>>>>' + loadedObjs);
-			//Now you can do sth with loaded objects (loadedObjs)
+		onOk : function(_res) {
+			var bar = [];
+			for (var i = 0; i < _res.length; i++) {
+				if (_res[i].getLatlngLatitude()) {
+					bar.push({
+						latitude : _res[i].getLatlngLatitude(),
+						longitude : _res[i].getLatlngLongitude(),
+						title : JSON.parse(_res[i].data.video).title,
+						devicename : _res[i].getDevicename()
+					});
+				}	
+			}
+			_callbacks.onload(bar);
 		},
 		onError : function(error) {
 			//handle error
@@ -162,6 +171,7 @@ ApiomatAdapter.prototype.setWatchedVideo = function() {
 		var myWatchedVideo = new Apiomat.WatchedVideo();
 		myWatchedVideo.setVideo(JSON.stringify(options.video));
 		myWatchedVideo.setVideoid(options.video.id);
+		myWatchedVideo.setDevicename(Ti.Platform.getModel());
 		if (_coords) {
 			myWatchedVideo.setLatlngLatitude(_coords.latitude);
 			myWatchedVideo.setLatlngLongitude(_coords.longitude);
