@@ -14,32 +14,29 @@ exports.create = function() {
 	self.updateSections = function() {
 		if (!self.apiomatuserready)
 			return;
-		Ti.App.Apiomat.getMyFavorites({}, {
-			onload : function(_listofvideos) {
-				if (!_listofvideos)
+		Ti.App.Apiomat.getMySubscribedChannels({}, {
+			onload : function(_listofchannels) {
+				if (!_listofchannels)
 					return;
-				var dataitems = [], videoitem;
-				for (var i = 0; i < _listofvideos.length; i++) {
-					var video = _listofvideos[i].video;
-					if (!video)
+				var dataitems = [], channelitem;
+				for (var i = 0; i < _listofchannels.length; i++) {
+					var channel = _listofchannels[i].channel;
+					if (!channel)
 						continue;
 					dataitems.unshift({
 						title : {
-							text : video.title
+							text : channel.name
 						},
 						subtitle : {
-							text : video.author
+							text : channel.author
 						},
 						thumb : {
-							image : video.thumb
-						},
-						duration : {
-							text : parseInt(video.duration.split(':')[0] * 60) + parseInt(video.duration.split(':')[1]) + ' min.'
+							image : channel.thumb
 						},
 						properties : {
 							//	selectionStyle : TiTi.UI.iPhone.ListViewCellSelectionStyle.NONE,
 							allowsSelection : true,
-							itemId : video.id,
+							itemId : JSON.stringify(channel),
 							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
 						}
 					});
@@ -50,8 +47,7 @@ exports.create = function() {
 		});
 	};
 	self.listview.addEventListener('itemclick', function(_e) {
-		var win = require('ui/videohomepage/window').create(_e.itemId);
-		win.open();
+		require('ui/videolist.window').create(JSON.parse(_e.itemId)).open();
 	});
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
 		self.lecture2goready = true;

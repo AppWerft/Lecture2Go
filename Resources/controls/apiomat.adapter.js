@@ -51,7 +51,6 @@ ApiomatAdapter.prototype.loginUser = function() {
 			that.user.loadMysubscribedchannels("order by createdAt", {
 				onOk : function() {
 					var mylectureseries = that.user.getMysubscribedchannels();
-					console.log(mylectureseries);
 					Ti.UI.createNotification({
 						message : mylectureseries.length + ' abonnierte Vorlesungsreihen geladen.'
 					}).show();
@@ -70,6 +69,7 @@ ApiomatAdapter.prototype.loginUser = function() {
 	return this;
 };
 
+/// Getter:
 ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
 	var myfavorites = this.user.getMyfavorites();
 	var faved = localsaved = watched = false;
@@ -86,16 +86,39 @@ ApiomatAdapter.prototype.getStatusofVideo = function(_id) {
 	};
 };
 
-ApiomatAdapter.prototype.getMe = function(_args, _callbacks) {
+ApiomatAdapter.prototype.isChannelsubscribed = function(_id) {
+	var mychannels = this.user.getMysubscribedchannels();
+	for (var i = 0; i < mychannels.length; i++) {
+		if (mychannels[i].data.lectureseriesId == _id) {
+			return true;
+		}
+	}
+	return false;
+};
+
+ApiomatAdapter.prototype.getMyFavorites = function(_args, _callbacks) {
 	var myfavorites = this.user.getMyfavorites();
 	for (var i = 0; i < myfavorites.length; i++) {
 		myfavorites[i].video = JSON.parse(myfavorites[i].data.video);
+		
 	}
 	_callbacks.onload && _callbacks.onload(myfavorites);
 };
 
+
+ApiomatAdapter.prototype.getMySubscribedChannels = function(_args, _callbacks) {
+	var mychannels = this.user.getMysubscribedchannels();
+	for (var i = 0; i < mychannels.length; i++) {
+		console.log(mychannels[i]);
+		mychannels[i].channel = JSON.parse(mychannels[i].data.channel);
+	}
+	_callbacks.onload && _callbacks.onload(mychannels);
+};
+
+/// SETTER:
 ApiomatAdapter.prototype.subscribeChannel = function() {
 	var options = arguments[0] || {};
+	var callbacks = arguments[1] || new Function();
 	var that = this;
 	var lectureseries = new Apiomat.subscribedChannels();
 	lectureseries.setChannel(JSON.stringify(options.lectureseries));
@@ -104,6 +127,7 @@ ApiomatAdapter.prototype.subscribeChannel = function() {
 		onOk : function() {
 			that.user.postMysubscribedchannels(lectureseries, {
 				onOk : function() {
+					callbacks.onsuccess();
 					console.log('Info: lectureseries ' + options.lectureseriesId + ' angelegt und user zugeordnet');
 				},
 				onError : function(error) {

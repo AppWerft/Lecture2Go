@@ -29,7 +29,7 @@ exports.create = function() {
 	}, {
 		icon : 'images/favorite.png',
 		title : 'Abonnierte Vorlesungen',
-		window : require('ui/mylectureseries.window').create()
+		window : require('ui/mysubscribedchannels.window').create()
 	}];
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({
@@ -39,6 +39,7 @@ exports.create = function() {
 		self.addTab(tabs[i]);
 	}
 	self.addEventListener('open', require('ui/actionbar_menu.widget'));
+	
 	self.addEventListener('androidback', function() {
 		var dialog = Ti.UI.createAlertDialog({
 			cancel : 1,

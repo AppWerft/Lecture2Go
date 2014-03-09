@@ -1,5 +1,6 @@
 exports.create = function() {
 	var options = arguments[0] || {};
+
 	var lectureseriesId = options.value;
 	var self = require('modules/l2g').create();
 	self.listview = Ti.UI.createListView({
@@ -71,22 +72,40 @@ exports.create = function() {
 						self.close();
 					};
 				}
-				if (options.key == 'channel' || options.key == 'lectureseries')
+				if (options.key == 'channel' || options.key == 'lectureseries') {
 					activity.onCreateOptionsMenu = function(e) {
+						var SUBSCRIBE = 0, UNSUBSCRIBE = 1;
+						var subscribed = Ti.App.Apiomat.isChannelsubscribed(options.value);
 						e.menu.add({
 							title : "Vorlesungsreihe abonnieren",
 							showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
-							itemId : 0,
+							itemId : SUBSCRIBE,
+							visible : (subscribed) ? false : true,
 							icon : '/assets/abo.png'
 						}).addEventListener("click", function() {
+							e.menu.removeItem(SUBSCRIBE);
 							Ti.App.Apiomat.subscribeChannel({
 								lectureseriesId : lectureseriesId,
 								lectureseries : options.channel
-							}, {});
-							activity.invalidateOptionsMenu();
+							}, {
+								onsuccess : function() {
+									e.menu.findItem(UNSUBSCRIBE).visible = true;
+								}
+							});
 						});
-					};
+						e.menu.add({
+							title : "Vorlesungsreihe abbestellen",
+							showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+							itemId : UNSUBSCRIBE,
+							visible : (subscribed) ? true : false,
 
+							icon : '/assets/unabo.png'
+						}).addEventListener("click", function() {
+
+						});
+
+					};
+				}
 			}
 		}
 	});
