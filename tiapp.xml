@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <property name="acs-oauth-secret-development" type="string">DXWKMMqZq9KldRak8IWw1hth1bG6pGYb</property>
-    <property name="acs-oauth-key-development" type="string">x4u7227v3fGVuEFqXcC6Al9GUdk26Zyz</property>
-    <property name="acs-api-key-development" type="string">z99aPo17ebcMPcnQHEVbl2ciEnHL7Hy7</property>
-   
-    <property name="acs-oauth-secret-production" type="string">j8ENyAwRHyXZbBxAS1Ly8iacDV7i8zG7</property>
-    <property name="acs-oauth-key-production" type="string">hJ2gYS4cyx2CKtHTIH2JIrW3lJqpP1CG</property>
-    <property name="acs-api-key-production" type="string">56tv5QQB00FBxweYoz8cvn26hNbtwzHy</property>
-   
     <!--<property name="apikey" type="string">7597029286098615760</property>-->
     <guid>e4a16f00-523b-49db-b603-d700be4ca5b1</guid>
     <deployment-targets>

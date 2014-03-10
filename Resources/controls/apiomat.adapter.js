@@ -26,16 +26,17 @@ var ApiomatAdapter = function() {
 	var that = this;
 	console.log('Info: start of retrieveDeviceToken()');
 	CloudPush.retrieveDeviceToken({
-		success : function (e) {
-			console.log('Info: deviceToken='+e.deviceToken);
+		success : function(e) {
+			console.log('Info: deviceToken=' + e.deviceToken);
 			CloudPush.enabled = true;
 			myPushDeviceToken = e.deviceToken;
-			Ti.App.Properties.setString('myPushDeviceToken',myPushDeviceToken);
+			Ti.App.Properties.setString('myPushDeviceToken', myPushDeviceToken);
 			that.loginUser();
 		},
-		error : function (e) {
+		error : function(e) {
 			console.log('=========================================CloudError:');
 			console.log(e);
+			that.loginUser();
 
 		}
 	});
