@@ -25,14 +25,17 @@ var ApiomatAdapter = function() {
 	this.user.setPassword('mylittlesecret');
 	var that = this;
 	console.log('Info: start of retrieveDeviceToken()');
-	//CloudPush.retrieveDeviceToken({
-	//	success : function (e) {
-	//		console.log('Info: deviceToken='+e.deviceToken);
-	//		myPushDeviceToken = e.deviceToken;
+	CloudPush.retrieveDeviceToken({
+		success : function (e) {
+			console.log('Info: deviceToken='+e.deviceToken);
+			myPushDeviceToken = e.deviceToken;
 			console.log('Info: start of Login into Apiomat');
 			that.loginUser();
-	//	}
-	//});
+		},
+		error : function (e) {
+			console.log(e);
+		}
+	});
 };
 
 ApiomatAdapter.prototype.loginUser = function() {
