@@ -31,19 +31,31 @@ var ApiomatAdapter = function() {
 
 };
 
+ApiomatAdapter.prototype.savePhoto2User = function(_args, _callbacks) {
+	this.user.postPhoto(_args.image, {
+		onOk : function(_imgHref) {
+			Ti.UI.createNotification({
+				message : 'Photoverstetigung war erfolgreich'
+			}).show();
+		}
+	});
+};
+
 ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
 	Apiomat.WatchedVideo.getWatchedVideos("", {
 		onOk : function(_res) {
 			var bar = [];
 			for (var i = 0; i < _res.length; i++) {
 				if (_res[i].getLatlngLatitude()) {
+					var video = JSON.parse(_res[i].data.video);
 					bar.push({
 						latitude : _res[i].getLatlngLatitude(),
 						longitude : _res[i].getLatlngLongitude(),
-						title : JSON.parse(_res[i].data.video).title,
-						devicename : _res[i].getDevicename()
+						devicename : _res[i].getDevicename(),
+						title : video.title,
+						thumb : video.thumb
 					});
-				}	
+				}
 			}
 			_callbacks.onload(bar);
 		},
@@ -67,7 +79,6 @@ ApiomatAdapter.prototype.loginUser = function() {
 					Ti.UI.createNotification({
 						message : myfavorites.length + ' Favoriten geladen.'
 					}).show();
-
 				},
 				onError : function(_err) {
 					console.log(_err);

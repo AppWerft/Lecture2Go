@@ -33,7 +33,6 @@ if(typeof goog !== 'undefined')
     goog.require('Apiomat.User');
     goog.require('Apiomat.WatchedVideo');
     goog.require('Apiomat.WatchedVideo');
-    goog.require('Apiomat.WatchedVideo');
     goog.require('Apiomat.subscribedChannels');
 }
 if(typeof exports === 'undefined')
@@ -181,94 +180,6 @@ Apiomat.VideoUser = function() {
                 var i = mywatched.indexOf(_refData);
                 if(i != -1) {
                     mywatched.splice(i, 1);
-                }
-            ;                 
-                if (_callback && _callback.onOk) {
-                    _callback.onOk();
-                }
-            },
-            onError : function(error) {
-                if (_callback && _callback.onError) {
-                    _callback.onError(error);
-                }
-            }
-        };
-        Apiomat.Datastore.getInstance().deleteOnServer(deleteHref, callback);
-    };    
-    
-    var mylocalsaved = [];
-    
-    this.getMylocalsaved = function() 
-    {
-        return mylocalsaved;
-    };
-    
-    this.loadMylocalsaved = function(query,callback) 
-    {
-        var refUrl = this.data.mylocalsavedHref;
-        Apiomat.Datastore.getInstance().loadFromServer(refUrl, {
-            onOk : function(obj) {
-                mylocalsaved = obj;
-                callback.onOk();
-            },
-            onError : function(error) {
-                callback.onError(error);
-            }
-        }, undefined, query, Apiomat.WatchedVideo);
-    };
-    
-    this.postMylocalsaved = function(_refData, _callback) 
-    {
-        if(_refData == false || typeof _refData.getHref() === 'undefined') {
-            var error = new Apiomat.ApiomatRequestError(Apiomat.Status.SAVE_REFERENECE_BEFORE_REFERENCING);
-            if (_callback && _callback.onError) {
-                    _callback.onError(error);
-            } else if(console && console.log) {
-                    console.log("Error occured: " + error);
-            }
-            return;
-        }
-        var callback = {
-            onOk : function(refHref) {
-                if (refHref) {
-                                    /* only add reference data if not already in local list */
-                    if(mylocalsaved.filter(function(_elem) {
-                        return _elem.getHref() && refHref && _elem.getHref() === refHref;
-                    }).length < 1)
-                    {
-                        mylocalsaved.push(_refData);
-                    } 
-                                }
-                if (_callback && _callback.onOk) {
-                    _callback.onOk();
-                }
-            },
-            onError : function(error) {
-                if (_callback && _callback.onError) {
-                    _callback.onError(error);
-                }
-            }
-        };
-         if(Apiomat.Datastore.getInstance().shouldSendOffline("POST"))
-        {
-            Apiomat.Datastore.getInstance( ).sendOffline( "POST", this.getHref(), _refData, "mylocalsaved", callback );
-        }
-        else
-        {
-            Apiomat.Datastore.getInstance().postOnServer(_refData, callback, this.data.mylocalsavedHref);
-        }
-    };
-    
-    this.removeMylocalsaved = function(_refData, _callback) 
-    {
-        var id = _refData.getHref().substring(_refData.getHref().lastIndexOf("/") + 1);
-        var deleteHref = this.data.mylocalsavedHref + "/" + id;
-        var callback = {
-            onOk : function(obj) {
-                            /* Find and remove reference from local list */
-                var i = mylocalsaved.indexOf(_refData);
-                if(i != -1) {
-                    mylocalsaved.splice(i, 1);
                 }
             ;                 
                 if (_callback && _callback.onOk) {
@@ -464,7 +375,7 @@ Apiomat.VideoUser = function() {
 Apiomat.VideoUser.AOMBASEURL = "https://apiomat.org/yambas/rest/apps/lecture2go";
 Apiomat.VideoUser.AOMAPIKEY = "7597029286098615760";
 Apiomat.VideoUser.AOMSYS = "LIVE";
-Apiomat.VideoUser.AOMSDKVERSION = "1.10-93";
+Apiomat.VideoUser.AOMSDKVERSION = "1.10-92";
 /* static methods */
 
 /**
@@ -511,13 +422,140 @@ Apiomat.VideoUser.prototype.setMywatched = function(_mywatched) {
     this.data.mywatched = _mywatched;
 };
 
-        Apiomat.VideoUser.prototype.getMylocalsaved = function() 
+    /**
+ * Returns an URL of the image. <br/> You can provide several optional parameters to
+ * manipulate the image:
+ * 
+ * @param width (optional)
+ *            the width of the image, 0 to use the original size. If only width
+ *            or height are provided, the other value is computed.
+ * @param height (optional)
+ *            the height of the image, 0 to use the original size. If only width
+ *            or height are provided, the other value is computed.
+ * @param backgroundColorAsHex (optional)
+ *            the background color of the image, null or empty uses the original
+ *            background color. Caution: Don't send the '#' symbol! Example:
+ *            <i>ff0000</i>
+ * @param alpha (optional)
+ *            the alpha value of the image, null to take the original value.
+ * @param format (optional)
+ *            the file format of the image to return, e.g. <i>jpg</i> or <i>png</i>
+  * @return the URL of the image
+ */
+Apiomat.VideoUser.prototype.getPhotoURL = function(width, height, bgColorAsHex, alpha, format) 
 {
-    return this.data.mylocalsaved;
+    var url = this.data.photoURL;
+    if(!url)
+    {
+        return undefined;
+    }
+    url += ".img?apiKey=" + Apiomat.User.AOMAPIKEY + "&system=" + Apiomat.User.AOMSYS;
+    if (width) {
+        url += "&width=" + width;
+    }
+    if (height) {
+        url += "&height=" + height;
+    }
+    if (bgColorAsHex) {
+        url += "&bgcolor=" + bgColorAsHex;
+    }
+    if (alpha) {
+        url += "&alpha=" + alpha;
+    }
+    if (format) {
+        url += "&format=" + format;
+    }
+    return url;
+}
+
+Apiomat.VideoUser.prototype.loadPhoto = function(width, height, bgColorAsHex, alpha, format,_callback)
+{
+    var resUrl = this.getPhotoURL(width, height, bgColorAsHex, alpha, format);
+    return Apiomat.Datastore.getInstance().loadResource(resUrl, _callback);
+}
+
+Apiomat.VideoUser.prototype.postPhoto = function(_data, _callback) 
+{
+    var postCB = {
+            onOk : function(_imgHref) {
+                if (_imgHref) {
+                    this.parent.data.photoURL = _imgHref;
+                    /* update model again */
+                    this.parent.save({
+                        onOk : function() {
+                            if (_callback && _callback.onOk) {
+                                _callback.onOk();
+                            }           
+                        },
+                        onError : function(error) {
+                            if (_callback && _callback.onError) {
+                                _callback.onError(error);
+                            }
+                        }
+                    });
+                }
+                else {
+                    var error = new Apiomat.ApiomatRequestError(Apiomat.Status.HREF_NOT_FOUND);
+                    if (_callback && _callback.onError) {
+                        _callback.onError(error);
+                    } else if(console && console.log) {
+                        console.log("Error occured: " + error);
+                    }
+                }
+            },
+            onError : function(error) {
+                if (_callback && _callback.onError) {
+                    _callback.onError(error);
+                }
+            }
+    };
+    postCB.parent = this;
+    if(Apiomat.Datastore.getInstance().shouldSendOffline("POST"))
+    {
+        Apiomat.Datastore.getInstance( ).sendOffline( "POST", null, _data, true, postCB );
+    }
+    else
+    {
+        Apiomat.Datastore.getInstance().postStaticDataOnServer(_data, true, postCB);
+    }
 };
 
-Apiomat.VideoUser.prototype.setMylocalsaved = function(_mylocalsaved) {
-    this.data.mylocalsaved = _mylocalsaved;
+Apiomat.VideoUser.prototype.deletePhoto = function(_callback) 
+{
+    var imageHref = this.data.photoURL;
+
+    var deleteCB = {
+        onOk : function() {
+            delete this.parent.data.photoURL;
+            /* update model again and save deleted image reference in model */
+            this.parent.save({
+                onOk : function() {
+                    if (_callback && _callback.onOk) {
+                        _callback.onOk();
+                    }           
+                },
+                onError : function(error) {
+                    if (_callback && _callback.onError) {
+                        _callback.onError(error);
+                    }
+                }
+            });
+        },
+        onError : function(error) {
+            if (_callback && _callback.onError) {
+                _callback.onError(error);
+            }
+        }
+    };
+    deleteCB.parent = this;
+    if(Apiomat.Datastore.getInstance().shouldSendOffline("DELETE"))
+    {
+        Apiomat.Datastore.getInstance( ).sendOffline( "DELETE", imageHref, null, null, deleteCB );
+    }
+    else
+    {
+        Apiomat.Datastore.getInstance().deleteOnServer(imageHref, deleteCB);
+    }
 };
 
         Apiomat.VideoUser.prototype.getMyfavorites = function() 
@@ -527,6 +565,15 @@ Apiomat.VideoUser.prototype.setMylocalsaved = function(_mylocalsaved) {
 
 Apiomat.VideoUser.prototype.setMyfavorites = function(_myfavorites) {
     this.data.myfavorites = _myfavorites;
+};
+
+        Apiomat.VideoUser.prototype.getFkennung = function() 
+{
+    return this.data.fkennung;
+};
+
+Apiomat.VideoUser.prototype.setFkennung = function(_fkennung) {
+    this.data.fkennung = _fkennung;
 };
 
         Apiomat.VideoUser.prototype.getMysubscribedchannels = function() 

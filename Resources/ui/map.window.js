@@ -7,12 +7,13 @@ exports.create = function() {
 	var self = require('modules/l2g').create();
 	self.mapview = Ti.Map.createView({
 		mapType : Ti.Map.TERRAIN_TYPE,
+		enableZoomControls : false,
 		region : {
 			latitude : 53.5629642,
 			longitude : 9.9884247,
 			latitudeDelta : 0.7,
-			longitudeDelta : 0.7,
-			enableZoomControls : false
+			longitudeDelta : 0.7
+
 		},
 		animate : true,
 		regionFit : true,
@@ -28,10 +29,16 @@ exports.create = function() {
 		Ti.App.Apiomat.getAllWatchedVideos(undefined, {
 			onload : function(_data) {
 				var pindata;
+				pins = [];
 				while ( pindata = _data.pop()) {
 					var annotation = Ti.Map.createAnnotation({
 						latitude : pindata.latitude,
 						longitude : pindata.longitude,
+						rightView : Ti.UI.createImageView({
+							width : 40,
+							height : 30,
+							image : pindata.thumb
+						}),
 						title : pindata.title,
 						subtitle : pindata.devicename,
 						pincolor : Ti.Map.ANNOTATION_RED
@@ -49,7 +56,16 @@ exports.create = function() {
 		self.mapview.removeAllAnnotations(pins);
 		//	self.remove(self.mapview);
 	});
-
+	var fotobutton = Ti.UI.createButton({
+		bottom : 10,
+		right : 0,
+		width : 120,
+		height : 120,
+		zIndex : 999,
+		backgroundImage : '/assets/rainer.png'
+	});
+	self.mapview.add(fotobutton);
+	fotobutton.addEventListener('click', require('controls/photocamera'));
 	return self;
 
 };
