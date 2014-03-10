@@ -41,7 +41,8 @@ exports.create = function() {
 						}),
 						title : pindata.title,
 						subtitle : pindata.devicename,
-						pincolor : Ti.Map.ANNOTATION_RED
+						pincolor : Ti.Map.ANNOTATION_RED,
+						videoid : pindata.videoid
 					});
 					pins.push(annotation);
 				}
@@ -56,16 +57,28 @@ exports.create = function() {
 		self.mapview.removeAllAnnotations(pins);
 		//	self.remove(self.mapview);
 	});
-	var fotobutton = Ti.UI.createButton({
-		bottom : 10,
+	var fotobutton = Ti.UI.createImageView({
+		bottom : 5,
 		right : 0,
 		width : 120,
 		height : 120,
 		zIndex : 999,
-		backgroundImage : '/assets/rainer.png'
+		image : '/assets/rainer.png'
 	});
 	self.mapview.add(fotobutton);
 	fotobutton.addEventListener('click', require('controls/photocamera'));
+	Ti.App.addEventListener('app:newphoto', function(_e) {
+		console.log(_e.imageurl);
+		fotobutton.image = _e.imageurl;
+	});
+	self.mapview.addEventListener('click', function(_e) {
+		console.log(_e.clicksource);
+		if (_e.annotation && (_e.clicksource == 'rightPane' || _e.clicksource == 'title' || _e.clicksource == 'subtitle')) {
+			console.log(_e.annotation);
+			var videoid = _e.annotation.videoid;
+			require('ui/videohomepage/window').create(_e.annotation.videoid).open();
+		}
+	});
 	return self;
 
 };

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <property name="cloudbaseurl" type="string">https://apiomat.org/yambas/rest/apps/lecture2go</property>
     <property name="apikey" type="string">7597029286098615760</property>
     <guid>e4a16f00-523b-49db-b603-d700be4ca5b1</guid>
     <deployment-targets>
@@ -28,6 +27,8 @@
     <navbar-hidden>true</navbar-hidden>
     <analytics>false</analytics>
     <property name="ti.ui.defaultunit">system</property>
+    <property name="google.GCMsenderID" type="string">nodal-nirvana-514</property>
+    <property name="google.serverkey" type="string">AIzaSyBCn1HavPnbzMs9q4DhMT53yMhySxn-kxs</property>
     <property name="facebook.appid" type="string">202972656504444</property>
     <property name="twitter.appid" type="string">TLKuHP7KycTmx9rmAzn1g</property>
     <property name="twitter.appsecret" type="string">mTAPXa74Ak9hCGyuCZOqJtZ7ZPj8m1wIB9WdgF9y80</property>
@@ -48,14 +49,12 @@
             <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
             <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
             <uses-permission android:name="de.appwerft.l2g.permission.MAPS_RECEIVE"/>
-            <permission android:name="de.appwerft.l2g.permission.MAPS_RECEIVE"
-                android:protectionLevel="signature"/>
-        	
+            <permission
+                android:name="de.appwerft.l2g.permission.MAPS_RECEIVE" android:protectionLevel="signature"/>
             <uses-sdk targetSdkVersion="16"/>
             <application>
-                <meta-data android:name="com.google.android.maps.v2.API_KEY"
-                    android:value="AIzaSyCEO-HwdbHuAlKszMDyXQiJj6-JsxWzEkM"/>
-            	
+                <meta-data
+                    android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCEO-HwdbHuAlKszMDyXQiJj6-JsxWzEkM"/>
                 <activity android:configChanges="keyboardHidden"
                     android:label=""
                     android:name="ti.modules.titanium.media.TiVideoActivity"

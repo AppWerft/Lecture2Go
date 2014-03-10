@@ -1,5 +1,10 @@
 var Apiomat = require('vendor/apiomat');
 var AssetStorage = require('vendor/asset.storage');
+var ImageCache = require('vendor/imagecache');
+var CloudPush = require('ti.cloudpush');
+var Cloud = require('ti.cloud');
+
+var myPushDeviceToken;
 
 var saveCB = {
 	onOk : function() {
@@ -8,72 +13,45 @@ var saveCB = {
 	}
 };
 
-// Constructor:
+///////////////////////////////////////
+// Constructor: ///////////////////////
+///////////////////////////////////////
 var ApiomatAdapter = function() {
-	// Following method produced error (file not found stuff)
-	/*	Apiomat.Datastore.setOfflineStrategy(Apiomat.AOMOfflineStrategy.USE_OFFLINE_CACHE, {
-	 onOk : function() {
-	 //Cache is initalized
-	 },
-	 onError : function(err) {
-	 //Error occurred
-	 }
-	 });*/
-
 	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
 	Ti.App.Properties.setString('uid', uid);
 	this.storage = new AssetStorage();
 	this.user = new Apiomat.VideoUser();
 	this.user.setUserName(uid);
 	this.user.setPassword('mylittlesecret');
-	// <= das knallt mit file not found Fehler
-	this.loginUser();
-
-};
-
-ApiomatAdapter.prototype.savePhoto2User = function(_args, _callbacks) {
-	this.user.postPhoto(_args.image, {
-		onOk : function(_imgHref) {
-			Ti.UI.createNotification({
-				message : 'Photoverstetigung war erfolgreich'
-			}).show();
-		}
-	});
-};
-
-ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
-	Apiomat.WatchedVideo.getWatchedVideos("", {
-		onOk : function(_res) {
-			var bar = [];
-			for (var i = 0; i < _res.length; i++) {
-				if (_res[i].getLatlngLatitude()) {
-					var video = JSON.parse(_res[i].data.video);
-					bar.push({
-						latitude : _res[i].getLatlngLatitude(),
-						longitude : _res[i].getLatlngLongitude(),
-						devicename : _res[i].getDevicename(),
-						title : video.title,
-						thumb : video.thumb
-					});
-				}
-			}
-			_callbacks.onload(bar);
-		},
-		onError : function(error) {
-			//handle error
-		}
-	});
-
+	var that = this;
+	console.log('Info: start of retrieveDeviceToken()');
+	//CloudPush.retrieveDeviceToken({
+	//	success : function (e) {
+	//		console.log('Info: deviceToken='+e.deviceToken);
+	//		myPushDeviceToken = e.deviceToken;
+			console.log('Info: start of Login into Apiomat');
+			that.loginUser();
+	//	}
+	//});
 };
 
 ApiomatAdapter.prototype.loginUser = function() {
 	var that = this;
+	var loaded = false;
 	Apiomat.Datastore.configure(this.user);
-	that.getAllWatchedVideos();
+	//that.getAllWatchedVideos();
 	this.user.loadMe({
 		onOk : function() {
 			that.user.loadMyfavorites("order by createdAt", {
 				onOk : function() {
+					if (loaded == true)
+						return;
+					loaded = true;
+					if (Ti.Android) {
+						that.user.setRegistrationId(myPushDeviceToken);
+					} else {
+						that.user.setDeviceToken(myPushDeviceToken);
+					}
 					console.log('User getFav OK');
 					var myfavorites = that.user.getMyfavorites();
 					Ti.UI.createNotification({
@@ -103,6 +81,51 @@ ApiomatAdapter.prototype.loginUser = function() {
 		}
 	});
 	return this;
+};
+
+/* this function will called from camera: */
+ApiomatAdapter.prototype.saveUserPhoto = function(_args, _callbacks) {
+	var that = this;
+	this.user.postPhoto(_args.image, {
+		onOk : function() {
+			ImageCache.get({
+				url : that.user.getPhotoURL(100, 100) + '&format=png'
+			}, {
+				onload : function(_image) {
+					Ti.App.fireEvent('app:newphoto', {
+						imageurl : _image
+					});
+				}
+			});
+
+		}
+	});
+};
+
+ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
+	Apiomat.WatchedVideo.getWatchedVideos("", {
+		onOk : function(_res) {
+			var bar = [];
+			for (var i = 0; i < _res.length; i++) {
+				if (_res[i].getLatlngLatitude()) {
+					var video = JSON.parse(_res[i].data.video);
+					bar.push({
+						latitude : _res[i].getLatlngLatitude(),
+						longitude : _res[i].getLatlngLongitude(),
+						devicename : _res[i].getDevicename(),
+						title : video.title,
+						thumb : video.thumb,
+						videoid : video.id
+					});
+				}
+			}
+			_callbacks.onload(bar);
+		},
+		onError : function(error) {
+			//handle error
+		}
+	});
+
 };
 
 /// Getter:
