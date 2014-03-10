@@ -4,7 +4,7 @@ var ImageCache = require('vendor/imagecache');
 var CloudPush = require('ti.cloudpush');
 var Cloud = require('ti.cloud');
 
-var myPushDeviceToken;
+var myPushDeviceToken = null;
 
 var saveCB = {
 	onOk : function() {
@@ -28,12 +28,15 @@ var ApiomatAdapter = function() {
 	CloudPush.retrieveDeviceToken({
 		success : function (e) {
 			console.log('Info: deviceToken='+e.deviceToken);
+			CloudPush.enabled = true;
 			myPushDeviceToken = e.deviceToken;
-			console.log('Info: start of Login into Apiomat');
+			Ti.App.Properties.setString('myPushDeviceToken',myPushDeviceToken);
 			that.loginUser();
 		},
 		error : function (e) {
+			console.log('=========================================CloudError:');
 			console.log(e);
+
 		}
 	});
 };
