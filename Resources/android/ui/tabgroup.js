@@ -6,21 +6,21 @@ exports.create = function() {
 	});
 	var tabs = [];
 	var taboptions = [{
-		title : 'Suchen&Finden',
+		title : 'Suchen',
 		window : require('ui/search.window').create()
 	}, {
-		title : 'Neuankömmlinge',
+		title : 'Neueste',
 		window : require('ui/videolist.window').create({
 			key : 'latest'
 		})
 	}, {
-		title : 'Straßenfeger',
+		title : 'Beliebteste',
 		window : require('ui/videolist.window').create({
 			key : 'popular'
 		})
 	}, {
 		icon : 'images/list.png',
-		title : 'Gesamtkatalog',
+		title : 'Katalog',
 		window : require('ui/departmenttree.window').create()
 	}, {
 		icon : 'images/favorite.png',
@@ -30,6 +30,10 @@ exports.create = function() {
 		icon : 'images/favorite.png',
 		title : 'Abonnierte Vorlesungen',
 		window : require('ui/mysubscribedchannels.window').create()
+	}, {
+		icon : 'images/favorite.png',
+		title : 'Live-Liste',
+		window : require('ui/lastwatched.window').create()
 	}, {
 		icon : 'images/favorite.png',
 		title : 'Live-Karte',

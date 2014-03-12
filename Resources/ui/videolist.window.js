@@ -36,7 +36,7 @@ exports.create = function() {
 							//	selectionStyle : TiTi.UI.iPhone.ListViewCellSelectionStyle.NONE,
 							allowsSelection : true,
 							itemId : _data.videos[i].id,
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURES
 						}
 					};
 					data.push(item);

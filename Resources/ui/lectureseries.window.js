@@ -1,6 +1,9 @@
 exports.create = function() {
 	var options = arguments[0] || {};
 	var self = require('modules/l2g').create();
+	self.actind = Ti.UI.createActivityIndicator({style:Titanium.UI.ActivityIndicatorStyle.BIG,message:'Ich besorge es Dir …'});
+	self.add(self.actind);
+	self.actind.show();
 	self.listview = Ti.UI.createListView({
 		templates : {
 			'row' : require('ui/TEMPLATES').videorow,
@@ -30,7 +33,7 @@ exports.create = function() {
 								title : _data.lectureseries[i].name,
 								channel : _data.lectureseries[i]
 							}),
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE
 						}
 					};
 					data.push(item);
@@ -38,6 +41,7 @@ exports.create = function() {
 				var section = Ti.UI.createListSection();
 				section.setItems(data);
 				self.listview.sections = [section];
+				self.actind.hide();
 			}
 		});
 	};
@@ -50,8 +54,9 @@ exports.create = function() {
 			channel : JSON.parse(_e.itemId).channel,
 		}).open();
 	});
-	self.update();
+
 	self.addEventListener('open', function() {
+		setTimeout(self.update, 30);
 		if (Ti.Android) {
 			var activity = self.getActivity();
 			if (activity.actionBar) {

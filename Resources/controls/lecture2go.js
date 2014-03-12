@@ -9,7 +9,7 @@ moment.lang('de_DE');
 
 var Model = function() {
 	var that = this;
-	this.getVideosFromSQL = function(sql,withthumb) {
+	this.getVideosFromSQL = function(sql, withthumb) {
 		var link = Ti.Database.open(DBNAME);
 		var _result = link.execute(sql);
 		var videos = [];
@@ -52,8 +52,9 @@ var Model = function() {
 					thumb : L2G_URL + '/images/' + idstr + '_m.jpg',
 					image : L2G_URL + '/images/' + idstr + '.jpg',
 				};
-				if (withthumb) video.channel.thumb =  that.getLatestImageByLectureseries(_result.fieldByName('channelid')).thumb;
-			
+				if (withthumb)
+					video.channel.thumb = that.getLatestImageByLectureseries(_result.fieldByName('channelid')).thumb;
+
 				videos.push(video);
 			}
 			_result.next();
@@ -80,6 +81,7 @@ var Model = function() {
 };
 
 Model.prototype.initVideoDB = function() {
+	console.log('Info: start initDB ================================')
 	var options = arguments[0] || {};
 	var dbname = null;
 	var old_mtime = null, new_mtime = null;
@@ -98,8 +100,8 @@ Model.prototype.initVideoDB = function() {
 			require('vendor/sqlite.adapter').getDB({
 				url : Ti.App.Properties.getString('dburl'),
 				mirror : false,
+				aspectedtablecount : 5,
 				onload : function(_args) {
-					console.log(_args);
 					options.onstatuschanged({
 						text : 'Kein Netz: verwende Offline-Datenbank.'
 					});
@@ -117,6 +119,7 @@ Model.prototype.initVideoDB = function() {
 	}
 
 	if (Ti.Network.online == false) {
+		console.log('Warning: no network available');
 		onoffline();
 		return;
 	}

@@ -27,7 +27,7 @@ exports.create = function(_tree, _hits) {
 							title : item[id]
 
 						}),
-						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE
 					}
 				});
 			}

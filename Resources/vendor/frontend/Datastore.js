@@ -362,23 +362,22 @@ Apiomat.Datastore = (function()
 							// available
 							onload : function(e)
 							{
-								Ti.API.info("Received response");
+								_processResponse(this, _expectedReturnCodes, _callback, _httpMethod, clazz);
 							},
 							// function called when an error occurs, including a
 							// timeout
 							onerror : function(e)
 							{
-								if (http
-										&& _expectedReturnCodes
-												.indexOf(http.status) > -1)
+								if (_expectedReturnCodes
+												.indexOf(this.status) > -1)
 								{
-									throw ex;
+									throw e;
 								}
 								else
 								{
 									var error = new Apiomat.ApiomatRequestError(
-											http.status, _expectedReturnCodes,
-											http.responseText);
+											this.status, _expectedReturnCodes,
+											this.responseText);
 									if (typeof _callback !== 'undefined'
 											&& _callback.onError)
 									{
@@ -422,97 +421,16 @@ Apiomat.Datastore = (function()
 			http.overrideMimeType('text/plain; charset=x-user-defined');
 		}
 		/* set http body if there any data */
-		http.onreadystatechange = function()
+		if(is_titanium == false)
 		{
-			if (http.readyState == 4)
+			http.onreadystatechange = function()
 			{
-				var errorOccured = false;
-				try
+				if (http.readyState == 4)
 				{
-					/* check if status code in expected ones */
-					if (_expectedReturnCodes.indexOf(http.status) > -1)
-					{
-						if (_callback && _callback.onOk)
-						{
-							/* save lastModified for url if safari */
-							if (is_safari && _httpMethod === "GET")
-							{
-								lastModified[_url] = http
-										.getResponseHeader("Last-Modified");
-							}
-
-							var elem = http.responseText;
-							if (_httpMethod === "GET"
-									&& typeof clazz !== 'undefined')
-							{
-								/* check if array */
-								var json = JSON.parse(http.responseText);
-								if (json instanceof Array)
-								{
-									elem = [];
-									for (var i = 0; i < json.length; i++)
-									{
-										var tmpElem = new clazz();
-										tmpElem.fromJson(json[i]);
-										elem.push(tmpElem);
-									}
-								} else
-								{
-									elem = new clazz();
-									elem.fromJson(json);
-								}
-							}
-							var returnedHref;
-							if (_httpMethod === "POST")
-							{
-								returnedHref = http
-										.getResponseHeader("Location");
-							}
-							_callback.onOk(_httpMethod === "GET" ? elem
-									: returnedHref || undefined);
-						}
-					} else
-					{
-						errorOccured = true;
-					}
-				} catch (ex)
-				{
-					if(is_titanium)
-					{
-						Ti.API.log("Error occured: " + ex);
-					}
-					/* only if it is a error that has nth to do with apiOmat rethrow*/
-					if(http && _expectedReturnCodes.indexOf(http.status) > -1)
-					{
-						throw ex;
-					}
-					else
-					{
-						errorOccured = true;
-					}
-				} finally
-				{
-					/* check if we have to set error */
-					if (errorOccured)
-					{
-						var error = new Apiomat.ApiomatRequestError(
-								http.status, _expectedReturnCodes,
-								http.responseText);
-						if (typeof _callback !== 'undefined'
-								&& _callback.onError)
-						{
-							_callback.onError(error);
-						} else
-						{
-							if (typeof console !== 'undefined' && console.error)
-							{
-								console.error("Error occured: " + error);
-							}
-						}
-					}
+					_processResponse(http, _expectedReturnCodes, _callback, _httpMethod, clazz);
 				}
-			}
-		};
+			};
+		}
 		if ((_httpMethod === "POST" || _httpMethod === "PUT")
 				&& typeof data !== 'undefined')
 		{
@@ -533,6 +451,95 @@ Apiomat.Datastore = (function()
 		} else
 		{
 			http.send();
+		}
+	}
+	
+	function _processResponse(http, _expectedReturnCodes, _callback, _httpMethod, clazz)
+	{
+		var errorOccured = false;
+		try
+		{
+			/* check if status code in expected ones */
+			if (_expectedReturnCodes.indexOf(http.status) > -1)
+			{
+				if (_callback && _callback.onOk)
+				{
+					/* save lastModified for url if safari */
+					if (is_safari && _httpMethod === "GET")
+					{
+						lastModified[_url] = http
+								.getResponseHeader("Last-Modified");
+					}
+
+					var elem = http.responseText;
+					if (_httpMethod === "GET"
+							&& typeof clazz !== 'undefined')
+					{
+						/* check if array */
+						var json = JSON.parse(http.responseText);
+						if (json instanceof Array)
+						{
+							elem = [];
+							for (var i = 0; i < json.length; i++)
+							{
+								var tmpElem = new clazz();
+								tmpElem.fromJson(json[i]);
+								elem.push(tmpElem);
+							}
+						} else
+						{
+							elem = new clazz();
+							elem.fromJson(json);
+						}
+					}
+					var returnedHref;
+					if (_httpMethod === "POST")
+					{
+						returnedHref = http
+								.getResponseHeader("Location");
+					}
+					_callback.onOk(_httpMethod === "GET" ? elem
+							: returnedHref || undefined);
+				}
+			} else
+			{
+				errorOccured = true;
+			}
+		} catch (ex)
+		{
+			if(is_titanium)
+			{
+				Ti.API.log("Error occured: " + ex);
+			}
+			/* only if it is a error that has nth to do with apiOmat rethrow*/
+			if(http && _expectedReturnCodes.indexOf(http.status) > -1)
+			{
+				throw ex;
+			}
+			else
+			{
+				errorOccured = true;
+			}
+		} finally
+		{
+			/* check if we have to set error */
+			if (errorOccured)
+			{
+				var error = new Apiomat.ApiomatRequestError(
+						http.status, _expectedReturnCodes,
+						http.responseText);
+				if (typeof _callback !== 'undefined'
+						&& _callback.onError)
+				{
+					_callback.onError(error);
+				} else
+				{
+					if (typeof console !== 'undefined' && console.error)
+					{
+						console.error("Error occured: " + error);
+					}
+				}
+			}
 		}
 	}
 

@@ -289,7 +289,7 @@ Apiomat.PushMessage.prototype.setFailureCount = function(_failureCount) {
  *            background color. Caution: Don't send the '#' symbol! Example:
  *            <i>ff0000</i>
  * @param alpha (optional)
- *            the alpha value of the image, null to take the original value.
+ *            the alpha value of the image (between 0 and 1), null to take the original value.
  * @param format (optional)
  *            the file format of the image to return, e.g. <i>jpg</i> or <i>png</i>
   * @return the URL of the image

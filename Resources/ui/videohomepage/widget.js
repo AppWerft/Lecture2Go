@@ -71,7 +71,7 @@ exports.create = function(_videodata) {
 		title : _videodata.channel.name
 	}));
 	var qr = 'http://qrfree.kaywa.com/?l=3&s=20&d=lecture2go%3A%2F%2F' + _videodata.id;
-	self.add(Ti.UI.createWebView({
+	/*self.add(Ti.UI.createWebView({
 		top : '40dp',
 		bottom : '100dp',
 		width : Ti.Platform.displayCaps.platformWidth,
@@ -82,7 +82,7 @@ exports.create = function(_videodata) {
 		hideLoadIndicator : true,
 		enableZoomControls : false,
 		disableBounce : true
-	}));
+	}));*/
 	self.videocontainer.addEventListener('click', function() {
 		require('ui/videohomepage/videoplayer.widget').create(_videodata);
 	});

@@ -44,7 +44,6 @@ Apiomat.Status = {
     CONCURRENT_ACCESS: 705,
     APPLICATION_SANDBOX: 706,
     MODEL_NOT_DEPLOYED: 707,
-    QUERY_ERROR: 708,
     WRONG_REF_TYPE: 709,
     ATTRIBUTE_NOT_SET: 710,
     OPERATION_NOT_POSSIBLE: 711,
@@ -77,6 +76,12 @@ Apiomat.Status = {
     LOCATION_INVALID: 738,
     SCRIPT_EXCEPTION: 739,
     BAD_CUSTOMERNAME: 740,
+    QUERY_ERROR: 708,
+    BAD_TYPE_IN_QUERY: 741,
+    UNKNOWN_CLASS_IN_QUERY: 742,
+    WRONG_NUM_FORMAT_IN_QUERY: 743,
+    QUERY_PARSE_ERROR: 744,
+    UNKNOWN_ATTRIBUTE_IN_QUERY: 745,
     APPLICATION_NOT_FOUND: 801,
     CUSTOMER_NOT_FOUND: 802,
     ID_NOT_FOUND: 803,
@@ -96,6 +101,7 @@ Apiomat.Status = {
     PAYMENT_DB_SIZE: 828,
     ENDPOINT_PATH_NOT_ALLOWED: 829,
     PAYMENT_NO_CRON: 1820,
+    PAYMENT_MODULE_NOT_FREE: 1821,
     ID_EXISTS: 830,
     NAME_RESERVED: 831,
     CIRCULAR_DEPENDENCY: 832,
@@ -154,9 +160,6 @@ getReasonPhrase : function(statusCode) {
         break;
     case Apiomat.Status.MODEL_NOT_DEPLOYED:
         phrase = "Model is not deployed!";
-        break;
-    case Apiomat.Status.QUERY_ERROR:
-        phrase = "Query could not be parsed!";
         break;
     case Apiomat.Status.WRONG_REF_TYPE:
         phrase = "Wrong reference type!";
@@ -254,6 +257,24 @@ getReasonPhrase : function(statusCode) {
     case Apiomat.Status.BAD_CUSTOMERNAME:
         phrase = "Customer name must contain only characters A-Z,a-z or 0-9!";
         break;
+    case Apiomat.Status.QUERY_ERROR:
+        phrase = "Query could not be parsed!";
+        break;
+    case Apiomat.Status.BAD_TYPE_IN_QUERY:
+        phrase = "The query contains a value with the wrong type";
+        break;
+    case Apiomat.Status.UNKNOWN_CLASS_IN_QUERY:
+        phrase = "The definition of the class couldn't be found";
+        break;
+    case Apiomat.Status.WRONG_NUM_FORMAT_IN_QUERY:
+        phrase = "A number was supplied in the wrong format";
+        break;
+    case Apiomat.Status.QUERY_PARSE_ERROR:
+        phrase = "The query couldn't be parsed";
+        break;
+    case Apiomat.Status.UNKNOWN_ATTRIBUTE_IN_QUERY:
+        phrase = "An attribute that was used in the query doesn't exist in the class";
+        break;
     case Apiomat.Status.APPLICATION_NOT_FOUND:
         phrase = "Application was not found!";
         break;
@@ -310,6 +331,9 @@ getReasonPhrase : function(statusCode) {
         break;
     case Apiomat.Status.PAYMENT_NO_CRON:
         phrase = "Cronjobs are not allowed for this plan.";
+        break;
+    case Apiomat.Status.PAYMENT_MODULE_NOT_FREE:
+        phrase = "This module is not available for free plan.";
         break;
     case Apiomat.Status.ID_EXISTS:
         phrase = "ID exists!";
@@ -440,9 +464,6 @@ getStatusForCode : function(httpCode) {
     case 707:
         statusCode = Apiomat.Status.MODEL_NOT_DEPLOYED;
         break;
-    case 708:
-        statusCode = Apiomat.Status.QUERY_ERROR;
-        break;
     case 709:
         statusCode = Apiomat.Status.WRONG_REF_TYPE;
         break;
@@ -539,6 +560,24 @@ getStatusForCode : function(httpCode) {
     case 740:
         statusCode = Apiomat.Status.BAD_CUSTOMERNAME;
         break;
+    case 708:
+        statusCode = Apiomat.Status.QUERY_ERROR;
+        break;
+    case 741:
+        statusCode = Apiomat.Status.BAD_TYPE_IN_QUERY;
+        break;
+    case 742:
+        statusCode = Apiomat.Status.UNKNOWN_CLASS_IN_QUERY;
+        break;
+    case 743:
+        statusCode = Apiomat.Status.WRONG_NUM_FORMAT_IN_QUERY;
+        break;
+    case 744:
+        statusCode = Apiomat.Status.QUERY_PARSE_ERROR;
+        break;
+    case 745:
+        statusCode = Apiomat.Status.UNKNOWN_ATTRIBUTE_IN_QUERY;
+        break;
     case 801:
         statusCode = Apiomat.Status.APPLICATION_NOT_FOUND;
         break;
@@ -595,6 +634,9 @@ getStatusForCode : function(httpCode) {
         break;
     case 1820:
         statusCode = Apiomat.Status.PAYMENT_NO_CRON;
+        break;
+    case 1821:
+        statusCode = Apiomat.Status.PAYMENT_MODULE_NOT_FREE;
         break;
     case 830:
         statusCode = Apiomat.Status.ID_EXISTS;

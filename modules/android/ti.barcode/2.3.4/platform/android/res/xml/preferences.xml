@@ -1,85 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
- Copyright (C) 2008 ZXing authors
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-  <PreferenceCategory android:title="@string/preferences_scanning_title">
-    <CheckBoxPreference
-        android:key="preferences_decode_1D"
-        android:defaultValue="true"
-        android:title="@string/preferences_decode_1D_title"/>
-    <CheckBoxPreference
-        android:key="preferences_decode_QR"
-        android:defaultValue="true"
-        android:title="@string/preferences_decode_QR_title"/>
-    <CheckBoxPreference
-        android:key="preferences_decode_Data_Matrix"
-        android:defaultValue="true"
-        android:title="@string/preferences_decode_Data_Matrix_title"/>
-  </PreferenceCategory>
-  <PreferenceCategory android:title="@string/preferences_actions_title">
-    <CheckBoxPreference
-        android:key="preferences_play_beep"
-        android:defaultValue="true"
-        android:title="@string/preferences_play_beep_title"/>
-    <CheckBoxPreference
-        android:key="preferences_vibrate"
-        android:defaultValue="false"
-        android:title="@string/preferences_vibrate_title"/>
-    <CheckBoxPreference
-        android:key="preferences_copy_to_clipboard"
-        android:defaultValue="true"
-        android:title="@string/preferences_copy_to_clipboard_title"/>
-    <CheckBoxPreference
-        android:key="preferences_remember_duplicates"
-        android:defaultValue="false"
-        android:title="@string/preferences_remember_duplicates_title"
-        android:summary="@string/preferences_remember_duplicates_summary"/>
-    <CheckBoxPreference
-        android:key="preferences_supplemental"
-        android:defaultValue="true"
-        android:title="@string/preferences_supplemental_title"
-        android:summary="@string/preferences_supplemental_summary"/>
-  </PreferenceCategory>
-  <PreferenceCategory android:title="@string/preferences_result_title">
-    <EditTextPreference
-        android:key="preferences_custom_product_search"
-        android:title="@string/preferences_custom_product_search_title"
-        android:summary="@string/preferences_custom_product_search_summary"/>
-  </PreferenceCategory>
-  <PreferenceCategory android:title="@string/preferences_general_title">
-    <CheckBoxPreference
-        android:key="preferences_front_light"
-        android:defaultValue="false"
-        android:title="@string/preferences_front_light_title"
-        android:summary="@string/preferences_front_light_summary"/>
-    <CheckBoxPreference
-        android:key="preferences_bulk_mode"
-        android:defaultValue="false"
-        android:title="@string/preferences_bulk_mode_title"
-        android:summary="@string/preferences_bulk_mode_summary"/>
-    <CheckBoxPreference
-        android:key="preferences_reverse_image"
-        android:defaultValue="false"
-        android:title="@string/preferences_reverse_image_title"
-        android:summary="@string/preferences_reverse_image_summary"/>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:title="Lecture2Go – Einstellungen">
+ 
+      
+    <PreferenceCategory
+        android:title="Startseite">  
     <ListPreference
-        android:key="preferences_search_country"
-        android:defaultValue="-"
-        android:entries="@array/country_codes"
-        android:entryValues="@array/country_codes"
-        android:title="@string/preferences_search_country"/>
+            android:key="startseite"
+            android:entries="@array/listentries"
+            android:entryValues="@array/listvalues"
+            android:summary="Hier kann die Startseite festgelegt werden. Das ist die Seite, die zuerst gezeigt wird, wenn Du die App startest."
+            android:title="" />
+     </PreferenceCategory>
+  
+    <PreferenceCategory android:title="Privatheitseinstellungen">
+     <CheckBoxPreference
+      android:title="Automat. Benachrichtigung"
+      android:defaultValue="true"
+      android:summary="Wenn der Schalter gesetzt ist und Du Vorlesungsreihen aboniert hast, wirst Du jedesmal informiert, wenn ein neues Video in Deiner Reihe publiziert wird."
+      android:key="push_enabled"/>
+     <CheckBoxPreference
+      android:title="Zugriff auf SD-Karte"
+      android:defaultValue="true"
+      android:summary="Bilder und Videos können lokal zwischengespeichert werden. Um den internen Speicher zu schonen, wird versucht die Daten auf einer eventuell vorhandenen SD-Karte zu speichern. Wer mag, kann das unterdrücken."
+      android:key="sd_enabled"/>
+   <!--
+      <CheckBoxPreference android:title="Anzeige auf LiveKarte"
+      android:summary="Wenn gesetzt wird bei jedem Videostart der ungefähre Standort, die Uhrzeit und das Video anonym(!) gespeichert. Es kann dann auf der LiveKarte angezeigt werden."
+      android:key="GEOALLOWED" />
+      
+      <CheckBoxPreference android:title="Zugriff auf SD-Karte" android:defaultValue="true"
+      android:summary=""
+      android:key="SDALLOWED" />
+      	-->
+  </PreferenceCategory>   
+ 
+  <PreferenceCategory android:title="Sichtbare Fenster">
+    <CheckBoxPreference
+      android:title="Neueste Videos"
+      android:defaultValue="true"
+      android:summary="Hier werden alle Videos aufgelistet, die neu ins Portal eingestellt wurden."
+      android:key="w1" />
+    <CheckBoxPreference
+      android:title="Beliebteste Videos"
+      android:defaultValue="true"
+      android:summary="Hier werden alle nach ihren Zugriffszahlen sortierte Videos aufgelistet."
+      android:key="w2" />
+    <CheckBoxPreference
+      android:title="Kategorien"
+      android:defaultValue="true"
+      android:summary="Alle Videos sind einem Kategoriebaum zugeordnet. In dem Fenster kann in dem Baum spaziert werden."
+      android:key="w3" />
+    <CheckBoxPreference
+      android:title="Live Liste"
+      android:defaultValue="true"
+      android:summary="Hier werden alle Videoabrufe in Echtzeit in einer Liste dargestellt"
+      android:key="w5" />
+    <CheckBoxPreference
+      android:title="Live Karte"
+      android:defaultValue="true"
+      android:summary="Hier werden alle Videoabrufe in Echtzeit auf einer Karte dargestellt"
+      android:key="w6" />
   </PreferenceCategory>
+ 
 </PreferenceScreen>

@@ -17,7 +17,7 @@ exports.create = function() {
 		},
 		animate : true,
 		regionFit : true,
-		userLocation : true
+		userLocation : false
 	});
 	self.mapview.addEventListener('complete', function() {
 	});
@@ -55,8 +55,7 @@ exports.create = function() {
 	});
 	self.addEventListener('blur', function() {
 		self.mapview.removeAllAnnotations(pins);
-		//	self.remove(self.mapview);
-	});
+		});
 	var fotobutton = Ti.UI.createImageView({
 		bottom : 5,
 		right : 0,

@@ -17,7 +17,7 @@ var saveCB = {
 // Constructor: ///////////////////////
 ///////////////////////////////////////
 var ApiomatAdapter = function() {
-	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Platform.createUUID();
+	var uid = (Ti.App.Properties.hasProperty('uid')) ? Ti.App.Properties.getString('uid') : Ti.Utils.md5HexDigest(Ti.Platform.getMacaddress());
 	Ti.App.Properties.setString('uid', uid);
 	this.storage = new AssetStorage();
 	this.user = new Apiomat.VideoUser();
@@ -25,6 +25,7 @@ var ApiomatAdapter = function() {
 	this.user.setPassword('mylittlesecret');
 	var that = this;
 	console.log('Info: start of retrieveDeviceToken()');
+	CloudPush.debug = true;
 	CloudPush.retrieveDeviceToken({
 		success : function(e) {
 			console.log('Info: deviceToken=' + e.deviceToken);
@@ -110,6 +111,8 @@ ApiomatAdapter.prototype.saveUserPhoto = function(_args, _callbacks) {
 };
 
 ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
+	var moment= require('vendor/moment');
+	moment.lang('de');
 	Apiomat.WatchedVideo.getWatchedVideos("", {
 		onOk : function(_res) {
 			var bar = [];
@@ -121,6 +124,7 @@ ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
 						longitude : _res[i].getLatlngLongitude(),
 						devicename : _res[i].getDevicename(),
 						title : video.title,
+						atime : moment(_res[i].getCreatedAt()).format('LLL'),
 						thumb : video.thumb,
 						videoid : video.id
 					});
@@ -234,6 +238,7 @@ ApiomatAdapter.prototype.setWatchedVideo = function() {
 		});
 	});
 };
+
 
 ApiomatAdapter.prototype.favVideo = function() {
 	var options = arguments[0] || {};

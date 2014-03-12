@@ -123,3 +123,105 @@ exports.videorow = {
 	}]
 };
 
+exports.lastvideorow = {
+	properties : {
+		height : Ti.UI.SIZE,
+		backgroundColor : 'black'
+	},
+	childTemplates : [{
+		type : 'Ti.UI.ImageView',
+		bindId : 'thumb',
+		properties : {
+			height : '55dp',
+			width : '90dp',
+			left : 0,
+			top : '5dp',
+			defaultImage : '/assets/l2g.png'
+		}
+	}, {
+		type : 'Ti.UI.Label',
+		bindId : 'duration',
+		properties : {
+			color : '#ddd',
+			height : '16dp',
+			font : {
+				fontSize : '10dp',
+				fontFamily : 'TheSans-B7Bold'
+			},
+			left : 5,
+			text : '____',
+			width : Ti.UI.FILL,
+			bottom : 1,
+
+		},
+		events : {}
+	}, {
+		type : 'Ti.UI.View',
+		properties : {
+			width : Ti.UI.FILL,
+			height : Ti.UI.SIZE,
+			left : '100dp',
+			right : '20dp',
+			layout : 'vertical'
+		},
+		childTemplates : [{
+			type : 'Ti.UI.Label',
+			bindId : 'title',
+			properties : {
+				color : '#F17B0D',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '16dp',
+					fontWeight : 'bold',
+				},
+				left : 0,
+				width : Ti.UI.FILL,
+				top : '5dp',
+				right : '10dp'
+			},
+			events : {}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'devicename',
+			properties : {
+				color : '#ccc',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '13dp',
+					fontFamily : 'TheSans-B7Bold'
+				},
+				width : Ti.UI.FILL,
+				left : 0
+			},
+			events : {}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'time',
+			properties : {
+				color : '#ccc',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '13dp',
+					fontFamily : 'TheSans-B7Bold'
+				},
+				width : Ti.UI.FILL,
+				left : 0
+			},
+			events : {}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'ort',
+			properties : {
+				color : '#ccc',
+				height : Ti.UI.SIZE,
+				font : {
+					fontSize : '13dp',
+					fontFamily : 'TheSans-B7Bold'
+				},
+				width : Ti.UI.FILL,
+				left : 0
+			},
+			events : {}
+		}]
+	}]
+};

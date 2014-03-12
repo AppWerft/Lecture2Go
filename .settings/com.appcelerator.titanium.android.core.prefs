@@ -1,5 +1,5 @@
 android/ATTR_PROJECT_NAME=lecture2go
-android/abi=
+android/abi=armeabi
 android/distribute_path=/Users/fuerst/Documents/Titanium Studio Workspace/lecture2go
 android/keystore_alias=googlekey
 android/keystore_password=*MHpsNH

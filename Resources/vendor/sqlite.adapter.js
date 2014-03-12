@@ -1,5 +1,7 @@
 exports.getDB = function() {
 	var options = arguments[0] || {};
+	console.log('Info: start DB mirroring in adapter ------------');
+	console.log(options);
 	function getNumberofTables() {
 		if (!dbname)
 			return;
@@ -22,6 +24,7 @@ exports.getDB = function() {
 			var total = res.fieldByName('total');
 			console.log('Info: tables found=' + total + ' aspectedtablecount=' + options.aspectedtablecount);
 			res.close();
+
 			if (total == options.aspectedtablecount && options.onload) {
 				Ti.Android && Ti.UI.createNotification({
 					message : "Keine neue Version verfügbar, nutze Daten der letzten Mutzung.",
