@@ -24,15 +24,6 @@
       android:defaultValue="true"
       android:summary="Bilder und Videos können lokal zwischengespeichert werden. Um den internen Speicher zu schonen, wird versucht die Daten auf einer eventuell vorhandenen SD-Karte zu speichern. Wer mag, kann das unterdrücken."
       android:key="sd_enabled"/>
-   <!--
-      <CheckBoxPreference android:title="Anzeige auf LiveKarte"
-      android:summary="Wenn gesetzt wird bei jedem Videostart der ungefähre Standort, die Uhrzeit und das Video anonym(!) gespeichert. Es kann dann auf der LiveKarte angezeigt werden."
-      android:key="GEOALLOWED" />
-      
-      <CheckBoxPreference android:title="Zugriff auf SD-Karte" android:defaultValue="true"
-      android:summary=""
-      android:key="SDALLOWED" />
-      	-->
   </PreferenceCategory>   
  
   <PreferenceCategory android:title="Sichtbare Fenster">
@@ -54,13 +45,13 @@
     <CheckBoxPreference
       android:title="Live Liste"
       android:defaultValue="true"
-      android:summary="Hier werden alle Videoabrufe in Echtzeit in einer Liste dargestellt"
+      android:summary="Hier werden alle Videoabrufe in Echtzeit in einer Liste dargestellt."
       android:key="w5" />
-    <CheckBoxPreference
-      android:title="Live Karte"
-      android:defaultValue="true"
-      android:summary="Hier werden alle Videoabrufe in Echtzeit auf einer Karte dargestellt"
-      android:key="w6" />
+    <EditTextPreference
+      android:title="Adminzugang"
+      android:summary="Nur für berechtigte Personen."
+      android:defaultValue=""
+      android:key="apikey" />
   </PreferenceCategory>
  
 </PreferenceScreen>

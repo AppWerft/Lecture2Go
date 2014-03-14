@@ -16,11 +16,13 @@ exports.create = function() {
 			return;
 		Ti.App.Apiomat.getMySubscribedChannels({}, {
 			onload : function(_listofchannels) {
-				if (!_listofchannels)
+				if (!_listofchannels) {
+					Ti.UI.createNotification({message:'Es liegen noch keine abonnierten Vorlesungsreihen vor.'}).show();
 					return;
+				}
 				var dataitems = [], channelitem;
 				for (var i = 0; i < _listofchannels.length; i++) {
-					var channel = _listofchannels[i].channel;
+					var channel = _listofchannels[i]
 					if (!channel)
 						continue;
 					dataitems.unshift({
@@ -37,7 +39,7 @@ exports.create = function() {
 							//	selectionStyle : TiTi.UI.iPhone.ListViewCellSelectionStyle.NONE,
 							allowsSelection : true,
 							itemId : JSON.stringify(channel),
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE
 						}
 					});
 				}

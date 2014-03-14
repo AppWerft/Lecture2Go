@@ -40,7 +40,7 @@ exports.create = function() {
 							//	selectionStyle : TiTi.UI.iPhone.ListViewCellSelectionStyle.NONE,
 							allowsSelection : true,
 							itemId : video.id,
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLUSURE
 						}
 					});
 				}

@@ -6,7 +6,8 @@
     <property name="acs-oauth-secret-development" type="string">CtclfM2IErswDYL6aLiJuSsndDCJGceg</property>
     <property name="acs-oauth-key-development" type="string">PM4nQlnTdAGxNvaUJpGk5WH6etcKTzJS</property>
     <property name="acs-api-key-development" type="string">TbmVQGdbhledzR2zPsh0ArsJVb0XdzYe</property>
-    <!--<property name="apikey" type="string">7597029286098615760</property>-->
+   
+    <property name="apikey" type="string">f6sv005</property>
     <guid>e4a16f00-523b-49db-b603-d700be4ca5b1</guid>
     <deployment-targets>
         <target device="tizen">false</target>

@@ -1,5 +1,6 @@
 exports.create = function(_args, _callbacks) {
-	if (Ti.App.Properties.hasProperty('GEOALLOWED') || true)
+	_callbacks.onallowed();
+	if (Ti.App.Properties.hasProperty('GEOALLOWED'))
 		_callbacks.onallowed();
 	var dialog = Ti.UI.createAlertDialog({
 		buttonNames : ['Nur diesmal erlauben', 'Immer freigeben', 'Nein'],

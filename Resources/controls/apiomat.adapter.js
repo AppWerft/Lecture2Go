@@ -3,6 +3,8 @@ var AssetStorage = require('vendor/asset.storage');
 var ImageCache = require('vendor/imagecache');
 var CloudPush = require('ti.cloudpush');
 var Cloud = require('ti.cloud');
+var moment = require('vendor/moment');
+moment.lang('de');
 
 var myPushDeviceToken = null;
 
@@ -111,9 +113,8 @@ ApiomatAdapter.prototype.saveUserPhoto = function(_args, _callbacks) {
 };
 
 ApiomatAdapter.prototype.getAllWatchedVideos = function(_args, _callbacks) {
-	var moment= require('vendor/moment');
-	moment.lang('de');
-	Apiomat.WatchedVideo.getWatchedVideos("", {
+
+	Apiomat.WatchedVideo.getWatchedVideos("order by createdAtlimit 100", {
 		onOk : function(_res) {
 			var bar = [];
 			for (var i = 0; i < _res.length; i++) {
@@ -177,10 +178,19 @@ ApiomatAdapter.prototype.getMyFavorites = function(_args, _callbacks) {
 
 ApiomatAdapter.prototype.getMySubscribedChannels = function(_args, _callbacks) {
 	var mychannels = this.user.getMysubscribedchannels();
+	var lectureseries = [];
 	for (var i = 0; i < mychannels.length; i++) {
-		mychannels[i].channel = JSON.parse(mychannels[i].data.channel);
+		var lectureserie = {};
+		try {
+			lectureserie = JSON.parse(mychannels[i].getChannel());
+			lectureserie.ctime = mychannels[i].getCreatedAt();
+			lectureserie && lectureseries.push(lectureserie);
+		} catch(E) {
+			console.log('Error: ' + E);
+		}
 	}
-	_callbacks.onload && _callbacks.onload(mychannels);
+	console.log(lectureseries);
+	_callbacks.onload && _callbacks.onload(lectureseries);
 };
 
 /// SETTER:
@@ -238,7 +248,6 @@ ApiomatAdapter.prototype.setWatchedVideo = function() {
 		});
 	});
 };
-
 
 ApiomatAdapter.prototype.favVideo = function() {
 	var options = arguments[0] || {};

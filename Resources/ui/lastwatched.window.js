@@ -27,12 +27,22 @@ exports.create = function() {
 						},
 						time : {
 							text : data.atime
+						},
+						properties : {
+							itemId : data.videoid,
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE
 						}
 					});
+					console.log(data);
 				}
 				self.listview.sections[0].setItems(dataitems);
 			}
 		});
+	});
+	self.listview.addEventListener('itemclick', function(_e) {
+		
+		require('ui/videohomepage/window').create(_e.itemId).open();
+
 	});
 	return self;
 };

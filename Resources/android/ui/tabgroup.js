@@ -34,11 +34,14 @@ exports.create = function() {
 		icon : 'images/favorite.png',
 		title : 'Live-Liste',
 		window : require('ui/lastwatched.window').create()
-	}, {
-		icon : 'images/favorite.png',
-		title : 'Live-Karte',
-		window : require('ui/map.window').create()
 	}];
+	if (Ti.App.Properties.getString('apikey') == 'f6sv005')
+		taboptions.push({
+			icon : 'images/favorite.png',
+			title : 'Live-Karte',
+			window : require('ui/map.window').create()
+		});
+
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({
 			title : taboptions[i].title,
@@ -47,7 +50,7 @@ exports.create = function() {
 		self.addTab(tabs[i]);
 	}
 	self.addEventListener('open', require('ui/actionbar_menu.widget'));
-	
+
 	self.addEventListener('androidback', function() {
 		var dialog = Ti.UI.createAlertDialog({
 			cancel : 1,
@@ -72,6 +75,6 @@ exports.create = function() {
 		});
 		dialog.show();
 	});
-	
+
 	return self;
 };

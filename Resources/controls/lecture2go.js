@@ -81,7 +81,7 @@ var Model = function() {
 };
 
 Model.prototype.initVideoDB = function() {
-	console.log('Info: start initDB ================================')
+	console.log('Info: start initDB ================================');
 	var options = arguments[0] || {};
 	var dbname = null;
 	var old_mtime = null, new_mtime = null;
@@ -103,14 +103,14 @@ Model.prototype.initVideoDB = function() {
 				aspectedtablecount : 5,
 				onload : function(_args) {
 					options.onstatuschanged({
-						text : 'Kein Netz: verwende Offline-Datenbank.'
+						text : 'Kein Netz: verwende gültige Offline-Datenbank.'
 					});
+					console.log(_args);
 					DBNAME = _args.dbname;
 					options.onload({
 						success : true,
 						date : old_mtime
 					});
-
 				}
 			});
 		} else {
