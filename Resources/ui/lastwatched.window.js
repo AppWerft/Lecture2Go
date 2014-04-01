@@ -1,7 +1,13 @@
 exports.create = function() {
 	var options = arguments[0] || {};
 	var self = require('modules/l2g').create();
+	var layer = Ti.UI.createView({
+		top : 0,
+		height : '100dp'
+	});
+
 	self.listview = Ti.UI.createListView({
+		top:'1	0dp',
 		templates : {
 			'row' : require('ui/TEMPLATES').lastvideorow
 		},
@@ -9,7 +15,7 @@ exports.create = function() {
 		sections : [Ti.UI.createListSection()]
 	});
 	self.add(self.listview);
-	self.addEventListener('focus', function() {
+	function updateList () {
 		Ti.App.Apiomat.getAllWatchedVideos(undefined, {
 			onload : function(_data) {
 				var pindata;
@@ -38,11 +44,22 @@ exports.create = function() {
 				self.listview.sections[0].setItems(dataitems);
 			}
 		});
-	});
-	self.listview.addEventListener('itemclick', function(_e) {
 		
+	}
+	
+	self.addEventListener('focus', updateList);
+	self.listview.addEventListener('itemclick', function(_e) {
 		require('ui/videohomepage/window').create(_e.itemId).open();
 
+	});
+	self.add(layer);
+	layer.addEventListener('swipe', function(_e) {
+		if (_e.direction == 'down') {
+			Ti.UI.createNotification({
+				message : 'Erneuere die Liste …'
+			}).show();
+			updateList();
+		}
 	});
 	return self;
 };

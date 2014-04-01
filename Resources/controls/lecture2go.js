@@ -1,8 +1,9 @@
 const VIDEOSTORAGENAME = 'VideoStorage';
 var DBNAME = null;
-const WOWZA_URL = 'http://fms1.rrz.uni-hamburg.de';
-const RTSP_URL = 'rtsp://fms.rrz.uni-hamburg.de';
-const L2G_URL = 'https://lecture2go.uni-hamburg.de';
+const WOWZA_URL = 'https://fms1.rrz.uni-hamburg.de';
+const RTSP_URL  = 'rtsp://fms.rrz.uni-hamburg.de';
+const L2G_URL   = 'https://lecture2go.uni-hamburg.de';
+
 const SELECT = 'SELECT v.pathpart, v.downloadLink, v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id, v.description, c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, lectureseries c';
 var moment = require('vendor/moment');
 moment.lang('de_DE');

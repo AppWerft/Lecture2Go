@@ -11,7 +11,7 @@ module.exports = function() {
 			title : "Suchen",
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0,
-			icon : '/assets/search.png'
+			icon : Ti.App.Android.R.drawable.ic_action_search
 		}).addEventListener("click", function() {
 			self.setActiveTab(0);
 			activity.invalidateOptionsMenu();
@@ -20,7 +20,7 @@ module.exports = function() {
 			title : "Einstellungen",
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0,
-			icon : '/assets/preferences.png'
+			icon : Ti.App.Android.R.drawable.ic_action_settings
 		}).addEventListener("click", function() {
 			Ti.UI.Android.openPreferences();
 			activity.invalidateOptionsMenu();
@@ -29,7 +29,7 @@ module.exports = function() {
 			title : "QR-Code",
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0,
-			icon : '/assets/qr.png'
+			icon : Ti.App.Android.R.drawable.ic_action_qrscan
 		}).addEventListener("click", function() {
 			require('ui/scan.widget').create();
 		});

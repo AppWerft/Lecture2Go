@@ -1,7 +1,10 @@
 exports.create = function() {
 	var options = arguments[0] || {};
 	var self = require('modules/l2g').create();
-	self.actind = Ti.UI.createActivityIndicator({style:Titanium.UI.ActivityIndicatorStyle.BIG,message:'Ich besorge es Dir …'});
+	self.actind = Ti.UI.createActivityIndicator({
+		style : Ti.UI.ActivityIndicatorStyle.BIG,
+		message : 'Ich besorge es Dir …'
+	});
 	self.add(self.actind);
 	self.actind.show();
 	self.listview = Ti.UI.createListView({

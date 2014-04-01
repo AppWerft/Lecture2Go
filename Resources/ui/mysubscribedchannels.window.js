@@ -22,7 +22,7 @@ exports.create = function() {
 				}
 				var dataitems = [], channelitem;
 				for (var i = 0; i < _listofchannels.length; i++) {
-					var channel = _listofchannels[i]
+					var channel = _listofchannels[i];
 					if (!channel)
 						continue;
 					dataitems.unshift({

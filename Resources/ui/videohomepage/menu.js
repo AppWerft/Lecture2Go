@@ -2,33 +2,29 @@ exports.add = function(_menu, _videodata) {
 	var status = Ti.App.Apiomat.getStatusofVideo(_videodata.id);
 	if (_videodata.downloadlink) {
 		_menu.add({
-			title : "Sharing",
-			icon : '/assets/share.png',
+			title : "offleinen",
+			icon : Ti.App.Android.R.drawable.ic_action_download,
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0
 		}).addEventListener("click", function() {
-			var intent = Ti.Android.createIntent({
+/*			var intent = Ti.Android.createIntent({
 				action : Ti.Android.ACTION_VIEW,
 				type : "video/mp4",
 				data : _videodata.videouri.mp4
 			});
-			Ti.Android.currentActivity.startActivity(intent);
+			Ti.Android.currentActivity.startActivity(intent);*/
 		});
 	}
 	_menu.add({
 		title : "Vormerken",
 		showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 		itemId : 1,
-		visible : (status.faved || !_videodata.downloadlink) ? false : true,
-		icon : '/assets/paperclip.png'
+		icon : (status.faved) ? Ti.App.Android.R.drawable.ic_action_favorite : Ti.App.Android.R.drawable.ic_action_no_favorite
 	}).addEventListener("click", function(_e) {
-		console.log(_e);
 		_e.source.visible = false;
-
 		Ti.App.Apiomat.favVideo({
 			video : _videodata,
 			onsuccess : function() {
-				Ti.Media.vibrate();
 			}
 		});
 	});

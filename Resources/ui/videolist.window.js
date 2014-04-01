@@ -81,7 +81,7 @@ exports.create = function() {
 							showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 							itemId : SUBSCRIBE,
 							visible : (subscribed) ? false : true,
-							icon : '/assets/abo.png'
+							icon :  Ti.App.Android.R.drawable.ic_action_no_favorite 
 						}).addEventListener("click", function() {
 							e.menu.removeItem(SUBSCRIBE);
 							Ti.App.Apiomat.subscribeChannel({
@@ -99,7 +99,7 @@ exports.create = function() {
 							itemId : UNSUBSCRIBE,
 							visible : (subscribed) ? true : false,
 
-							icon : '/assets/unabo.png'
+							icon :  Ti.App.Android.R.drawable.ic_action_favorite 
 						}).addEventListener("click", function() {
 
 						});

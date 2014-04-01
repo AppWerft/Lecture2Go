@@ -1,5 +1,6 @@
 exports.create = function(_args, _callbacks) {
 	_callbacks.onallowed();
+	return;
 	if (Ti.App.Properties.hasProperty('GEOALLOWED'))
 		_callbacks.onallowed();
 	var dialog = Ti.UI.createAlertDialog({

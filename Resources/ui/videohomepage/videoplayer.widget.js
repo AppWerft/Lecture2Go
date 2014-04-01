@@ -13,11 +13,11 @@ exports.create = function() {
 		});
 		videoplayer.addEventListener('complete', function(e) {
 			if (e.reason == 0) {
-				win.close();
+				Ti.Android.Activity	 && Ti.Android.Activity.finish();
 			};
 		});
 	}
- 	// start of code:
+	// start of code:
 	var videodata = arguments[0] || {};
 	if (Ti.Network.online == false)
 		return;
@@ -32,6 +32,11 @@ exports.create = function() {
 			message : 'Streame Video mit rtsp'
 		}).show();
 	}
+	Ti.App.Apiomat.setWatchedVideo({
+		video : videodata
+	});
+	startVideo();
+	return;
 	require('controls/geolocation.question').create(undefined, {
 		onallowed : function() {
 			Ti.App.Apiomat.setWatchedVideo({
