@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Orange" parent="android:Theme.Holo">
+
+    <item name="android:editTextBackground">@drawable/orange_edit_text_holo_dark</item>
+
+    <item name="android:textColorHighlight">#99f17b0d</item>
+    <item name="android:textSelectHandleLeft">@drawable/orange_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/orange_text_select_handle_right</item>
+    <item name="android:textSelectHandle">@drawable/orange_text_select_handle_middle</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewOrange</item>
+
+    <item name="android:listChoiceIndicatorMultiple">@drawable/orange_btn_check_holo_dark</item>
+
+    <item name="android:listChoiceIndicatorSingle">@drawable/orange_btn_radio_holo_dark</item>
+
+    <item name="android:buttonStyle">@style/ButtonOrange</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonOrange</item>
+
+    <item name="android:dropDownSpinnerStyle">@style/SpinnerOrange</item>
+
+    <item name="android:progressBarStyleHorizontal">@style/ProgressBarOrange</item>
+
+    <item name="android:buttonStyleToggle">@style/ToggleOrange</item>
+
+    <item name="android:listChoiceBackgroundIndicator">@drawable/orange_list_selector_holo_dark</item>
+
+    <item name="android:activatedBackgroundIndicator">@drawable/orange_activated_background_holo_dark</item>
+
+    <item name="android:fastScrollThumbDrawable">@drawable/orange_fastscroll_thumb_holo</item>
+
+  </style>
+
+</resources>

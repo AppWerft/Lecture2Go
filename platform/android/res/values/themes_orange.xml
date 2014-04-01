@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Orange" parent="android:Theme.Black">
+
+    <item name="android:editTextStyle">@style/EditTextOrange</item>
+
+    <item name="android:textColorHighlight">#99f17b0d</item>
+
+    <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewOrange</item>
+
+    <item name="android:checkboxStyle">@style/CheckBoxOrange</item>
+
+    <item name="android:radioButtonStyle">@style/RadioButtonOrange</item>
+
+    <item name="android:buttonStyle">@style/ButtonOrange</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonOrange</item>
+
+    <item name="android:spinnerStyle">@style/SpinnerOrange</item>
+
+    <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemOrange</item>
+
+    <item name="android:progressBarStyleHorizontal">@style/ProgressBarOrange</item>
+
+    <item name="android:buttonStyleToggle">@style/ToggleOrange</item>
+
+    <item name="android:listViewStyle">@style/ListViewOrange</item>
+
+    <item name="android:listViewWhiteStyle">@style/ListViewOrange.White</item>
+
+    <item name="android:spinnerItemStyle">@style/SpinnerItemOrange</item>
+
+  </style>
+
+</resources>
