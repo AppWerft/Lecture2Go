@@ -40,6 +40,8 @@
     <property name="twitter.appid" type="string">TLKuHP7KycTmx9rmAzn1g</property>
     <property name="twitter.appsecret" type="string">mTAPXa74Ak9hCGyuCZOqJtZ7ZPj8m1wIB9WdgF9y80</property>
     <property name="dbmirrorurl" type="string">http://lecture2go2.rrz.uni-hamburg.de/appdb/</property>
+    <property name="apiomat.login" type="string">kontaktschmied</property>
+    <property name="apiomat.mail" type="string">elb.min@uni-hamburg.de</property>
     <iphone>
         <orientations device="iphone">
             <orientation>Ti.UI.PORTRAIT</orientation>
@@ -69,7 +71,8 @@
 		<activity android:name="ti.modules.titanium.map.TiMapActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:launchMode="singleTask"/>
 		<activity android:configChanges="keyboardHidden|screenSize" android:label="" android:name="ti.modules.titanium.media.TiVideoActivity" android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
 		<activity android:configChanges="keyboardHidden|screenSize" android:label="" android:name="ti.modules.titanium.ui.TiTabActivity" android:screenOrientation="sensorPortrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
-		<activity android:name="com.google.zxing.client.android.CaptureActivity" android:screenOrientation="landscape" android:clearTaskOnLaunch="true" android:stateNotNeeded="true" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden">
+		<activity android:name="com.google.zxing.client.android.CaptureActivity" android:screenOrientation="landscape" android:clearTaskOnLaunch="true" android:stateNotNeeded="true" android:configChanges="orientation|keyboardHidden|screenSize" 
+			 android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden">
 			<intent-filter>
 				<action android:name="com.google.zxing.client.android.SCAN"/>
 				<category android:name="android.intent.category.DEFAULT"/>

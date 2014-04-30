@@ -14,8 +14,10 @@ exports.create = function() {
 	self.updateSections = function() {
 		if (!self.apiomatuserready)
 			return;
+		console.log('Info: start favchannel update');	
 		Ti.App.Apiomat.getMySubscribedChannels({}, {
 			onload : function(_listofchannels) {
+				console.log('Info: start favchannel rendering');	
 				if (!_listofchannels) {
 					Ti.UI.createNotification({message:'Es liegen noch keine abonnierten Vorlesungsreihen vor.'}).show();
 					return;
@@ -75,6 +77,5 @@ exports.create = function() {
 		}
 	});
 	return self;
-
 };
 

@@ -45,6 +45,16 @@ var ApiomatAdapter = function() {
 	});
 };
 
+ApiomatAdapter.prototype.ping = function() {
+	var callbacks = arguments[1] || {};
+	var xhr = Ti.Network.createHTTPClient({
+		onload : callbacks.ononline,
+		onerror : callbacks.onoffline
+	});
+	xhr.open('HEAD', 'https://apiomat.org/yambas/rest',true);
+	xhr.send();
+};
+
 ApiomatAdapter.prototype.loginUser = function() {
 	var that = this;
 	var loaded = false;
@@ -181,15 +191,16 @@ ApiomatAdapter.prototype.getMySubscribedChannels = function(_args, _callbacks) {
 	var lectureseries = [];
 	for (var i = 0; i < mychannels.length; i++) {
 		var lectureserie = {};
-		try {
-			lectureserie = JSON.parse(mychannels[i].getChannel());
-			lectureserie.ctime = mychannels[i].getCreatedAt();
-			lectureserie && lectureseries.push(lectureserie);
-		} catch(E) {
-			console.log('Error: ' + E);
+		if (mychannels[i].getChannel()) {
+			try {
+				lectureserie = JSON.parse(mychannels[i].getChannel());
+				lectureserie.ctime = mychannels[i].getCreatedAt();
+				lectureserie && lectureseries.push(lectureserie);
+			} catch(E) {
+				console.log('Error: ' + E);
+			}
 		}
 	}
-	console.log(lectureseries);
 	_callbacks.onload && _callbacks.onload(lectureseries);
 };
 

@@ -1,7 +1,6 @@
 exports.create = function() {
 	self = Ti.UI.createTabGroup({
 		exitOnClose : true,
-		fullscreen : true,
 		orientationModes : [Ti.UI.PORTRAIT, Ti.UI.UPSIDE_PORTRAIT]
 	});
 	var tabs = [];
