@@ -21,8 +21,9 @@
  * var dbmodule = new (require('sqlite.adapter'))('http://URLtoSQLiteDB');
  * dbmodule.startmirror();
  * dbmodule.addEventListener('onload',function(_e) {
- * 		Ti.Database.open(_e.dbname);
- * })
+ * 		if (_e.success==true) Ti.Database.open(_e.dbname);
+ * });
+ * 
 */
 var DB = function() {
 	this.options = arguments[0] || {};
@@ -42,7 +43,45 @@ var DB = function() {
 		link.close();
 	};
 
-	var onOffline = function() {
+
+	var that = this;
+	var DBconn = undefined;
+	var xhr = Ti.Network.createHTTPClient({
+		onerror : onOffline,
+		ondatastream : function(_p) {
+			that.fireEvent('progress',{progress:_p.progress});
+		},
+		onload : function() {
+			var filename = dbname + '.sql';
+			var tempfile = Ti.Filesystem.getFile(Ti.Filesystem.getTempDirectory(), filename);
+			tempfile.write(this.responseData);
+			try {
+				var dummy = Ti.Database.open(dbname);
+				if (Ti.Android) {
+					dummy.close();
+					dummy.remove();
+				} else {
+					console.log('Info: try to remove ' + dummy.file);
+					dummy.file.deleteFile();
+				}
+			} catch(E) {
+				onOffline();
+				return;
+			}
+			DBconn = Ti.Database.install(tempfile.nativePath, dbname);
+			DBconn.close();
+			var numberoftables = getNumberofTables();
+			that.fireEvent('onload',{success:true,dbname:that.dbname});	
+		}
+	});
+	console.log(options);
+	xhr.open('GET', options.url);
+	xhr.send();
+
+};
+
+DB.prototype = {/* standard methods for event/observer pattern */
+		_onOffline : function() {
 		console.log('Info: offline node ==> try to open cached db');
 		DBconn = Ti.Database.open(dbname);
 		var res = DBconn.execute('SELECT count(*) total FROM sqlite_master WHERE type="table" order by name');
@@ -50,12 +89,7 @@ var DB = function() {
 			var total = res.fieldByName('total');
 			console.log('Info: tables found=' + total + ' aspectedtablecount=' + options.aspectedtablecount);
 			res.close();
-
 			if (total == options.aspectedtablecount && options.onload) {
-				Ti.Android && Ti.UI.createNotification({
-					message : "Keine neue Version verfügbar, nutze Daten der letzten Mutzung.",
-					duration : Ti.UI.NOTIFICATION_DURATION_LONG
-				}).show();
 				options.onload({
 					dbname : dbname,
 					tables : total
@@ -75,60 +109,13 @@ var DB = function() {
 				DBconn.file.deleteFile();
 			alert('Für die Aktualisierung der Daten braucht die App wenigstens einmal das Internet');
 		}
-	};
-	var self = this;
-	var DBconn = undefined;
-	var dbname = Ti.Utils.md5HexDigest(options.url);
-	if (!options.mirror) {
-		options.onload && options.onload({
-			dbname : dbname,
-			numberoftables : getNumberofTables()
-		});
-		return;
-	}
-	var xhr = Ti.Network.createHTTPClient({
-		onerror : onOffline,
-		ondatastream : function(_p) {
-			if (options.onprogress) {
-				if (_p.progress < 0)
-					_p.progress = (1 - _p.progress / options.aspectedcontentlength) / 2;
-				options.onprogress(_p.progress);
-			}
-		},
-		onload : function() {
-			var filename = dbname + '.sql';
-			console.log('Info: dbfilename=' + filename);
-			var tempfile = Ti.Filesystem.getFile(Ti.Filesystem.getTempDirectory(), filename);
-			tempfile.write(this.responseData);
-			try {
-				var dummy = Ti.Database.open(dbname);
-				if (Ti.Android) {
-					dummy.close();
-					dummy.remove();
-				} else {
-					console.log('Info: try to remove ' + dummy.file);
-					dummy.file.deleteFile();
-				}
-			} catch(E) {
-				onOffline();
-				return;
-			}
-			DBconn = Ti.Database.install(tempfile.nativePath, dbname);
-			DBconn.close();
-			var numberoftables = getNumberofTables();
-			options.onload && options.onload({
-				dbname : dbname,
-				numberoftables : numberoftables
-			});
-		}
-	});
-	console.log(options);
-	xhr.open('GET', options.url);
-	xhr.send();
-
-};
-
-DB.prototype = {/* standard methods for event/observer pattern */
+	},
+	
+	
+	
+	
+	
+	
 	fireEvent : function(_event, _payload) {
 		if (this.eventhandlers[_event]) {
 			for (var i = 0; i < this.eventhandlers[_event].length; i++) {
