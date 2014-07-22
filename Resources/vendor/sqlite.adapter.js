@@ -4,14 +4,16 @@
  * url<String> == url of database 
  * tablecount<Number> = aspected count of tables in database (for validation)
  * Methods:
- * start      == start mirroring
- * testdb     == tests db 
+ * startmirror == start mirroring
+ * testdb      == tests db 
  * Events:
- * onloaded   == if databse is ready to use and can be opened
+ * onloaded    == if databse is ready to use and can be opened
  *         payload:
  * 				success : true or false
  * 				mtime   : (optional) the age of database	
- * onprogress == during mirroring you get progress (0...1) 
+ * onprogress  == during mirroring you get progress (0...1) 
+ * 		   payload:
+ * 				ratio : (0..1)		
  * 
  *
 */
