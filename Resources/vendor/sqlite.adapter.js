@@ -5,17 +5,24 @@
  * tablecount<Number> = aspected count of tables in database (for validation)
  * Methods:
  * startmirror == start mirroring
- * testdb      == tests db 
+ * testdb      == tests db on tablecount
  * Events:
- * onloaded    == if databse is ready to use and can be opened
+ * onload      == if databse is ready to use and can be opened
  *         payload:
  * 				success : true or false
+ * 				dbname  : (String) database name   
  * 				mtime   : (optional) the age of database	
  * onprogress  == during mirroring you get progress (0...1) 
  * 		   payload:
  * 				ratio : (0..1)		
  * 
- *
+ * Usage:
+ * 
+ * var dbmodule = new (require('sqlite.adapter'))('http://URLtoSQLiteDB');
+ * dbmodule.startmirror();
+ * dbmodule.addEventListener('onload',function(_e) {
+ * 		Ti.Database.open(_e.dbname);
+ * })
 */
 var DB = function() {
 	this.options = arguments[0] || {};
