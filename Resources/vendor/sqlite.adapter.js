@@ -78,9 +78,8 @@ DB.prototype = {
 	/* public functions; */
 	mirror : function() {
 		var that = this;
-		var DBconn = undefined;
 		var xhr = Ti.Network.createHTTPClient({
-			onerror : onOffline,
+			onerror : that._onOffline,
 			ondatastream : function(_p) {
 				that.fireEvent('progress', {
 					progress : _p.progress
@@ -100,22 +99,20 @@ DB.prototype = {
 						dummy.file.deleteFile();
 					}
 				} catch(E) {
-					onOffline();
+					that._onOffline();
 					return;
 				}
-				DBconn = Ti.Database.install(tempfile.nativePath, dbname);
+				var DBconn = Ti.Database.install(tempfile.nativePath, dbname);
 				DBconn.close();
-				var numberoftables = getNumberofTables();
-				that.fireEvent('onload', {
-					success : true,
-					dbname : that.dbname
-				});
+				if (that.options.tablecount  == that._getNumberofTables())
+					that.fireEvent('onload', {
+						success : true,
+						dbname : that.dbname
+					});
 			}
 		});
-		console.log(options);
 		xhr.open('GET', options.url);
 		xhr.send();
-
 	},
 
 	/* standard methods for event/observer pattern */
