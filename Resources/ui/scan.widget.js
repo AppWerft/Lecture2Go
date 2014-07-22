@@ -17,7 +17,7 @@ exports.create = function() {
 		if (res) {
 			console.log(res[1]);
 			Barcode.cancel();
-			var win = require('ui/videohomepage.window').create(res[1]);
+			var win = require('ui/videohomepage/window').create(res[1]);
 			win.open();
 		}
 	});

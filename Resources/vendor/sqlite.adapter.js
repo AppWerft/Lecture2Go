@@ -1,7 +1,24 @@
-exports.getDB = function() {
-	var options = arguments[0] || {};
-	console.log('Info: start DB mirroring in adapter ------------');
-	console.log(options);
+/*
+ * This module shows how you can cache remote SQLite databases
+ * Parameters:
+ * url<String> == url of database 
+ * tablecount<Number> = aspected count of tables in database (for validation)
+ * Methods:
+ * start      == start mirroring
+ * testdb     == tests db 
+ * Events:
+ * onloaded   == if databse is ready to use and can be opened
+ *         payload:
+ * 				success : true or false
+ * 				mtime   : (optional) the age of database	
+ * onprogress == during mirroring you get progress (0...1) 
+ * 
+ *
+*/
+var DB = function() {
+	this.options = arguments[0] || {};
+	this.eventhandlers = {};
+	this.dbname = Ti.Utils.md5HexDigest(options.url);
 	function getNumberofTables() {
 		if (!dbname)
 			return;
@@ -101,3 +118,28 @@ exports.getDB = function() {
 	xhr.send();
 
 };
+
+DB.prototype = {/* standard methods for event/observer pattern */
+	fireEvent : function(_event, _payload) {
+		if (this.eventhandlers[_event]) {
+			for (var i = 0; i < this.eventhandlers[_event].length; i++) {
+				this.eventhandlers[_event][i].call(this, _payload);
+			}
+		}
+	},
+	addEventListener : function(_event, _callback) {
+		if (!this.eventhandlers[_event])
+			this.eventhandlers[_event] = [];
+		this.eventhandlers[_event].push(_callback);
+	},
+	removeEventListener : function(_event, _callback) {
+		if (!this.eventhandlers[_event])
+			return;
+		var newArray = this.eventhandlers[_event].filter(function(element) {
+			return element != _callback;
+		});
+		this.eventhandlers[_event] = newArray;
+	}
+};
+
+module.exports = DB;
