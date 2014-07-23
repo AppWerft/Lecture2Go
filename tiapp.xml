@@ -11,12 +11,12 @@
     <deployment-targets>
         <target device="tizen">false</target>
         <target device="mobileweb">false</target>
-        <target device="iphone">true</target>
+        <target device="iphone">false</target>
         <target device="ipad">false</target>
         <target device="android">true</target>
         <target device="blackberry">false</target>
     </deployment-targets>
-    <sdk-version>3.2.3.GA</sdk-version>
+    <sdk-version>3.3.0.GA</sdk-version>
     <id>de.appwerft.l2g</id>
     <name>lecture2go</name>
     <version>1.0.1</version>

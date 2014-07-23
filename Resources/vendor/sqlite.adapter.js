@@ -28,7 +28,7 @@
 var DB = function() {
 	this.options = arguments[0] || {};
 	this.eventhandlers = {};
-	this.dbname = Ti.Utils.md5HexDigest(options.url);
+	this.dbname = Ti.Utils.md5HexDigest(this.options.url);
 };
 
 DB.prototype = {
@@ -41,11 +41,11 @@ DB.prototype = {
 			var total = res.fieldByName('total');
 			console.log('Info: tables found=' + total + ' aspectedtablecount=' + options.aspectedtablecount);
 			res.close();
-			if (total == options.aspectedtablecount && options.onload) {
-				options.onload({
-					dbname : dbname,
-					tables : total
-				});
+			if (that.options.tablecount  == that._getNumberofTables()) {
+					that.fireEvent('onload', {
+						success : true,
+						dbname : that.dbname
+					});
 			} else {
 				if (Ti.Android)
 					DBconn.remove();
@@ -111,7 +111,7 @@ DB.prototype = {
 					});
 			}
 		});
-		xhr.open('GET', options.url);
+		xhr.open('GET', that.options.url);
 		xhr.send();
 	},
 
