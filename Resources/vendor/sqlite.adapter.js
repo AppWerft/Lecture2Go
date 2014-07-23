@@ -2,7 +2,8 @@
  * This module shows how you can cache remote SQLite databases
  * Parameters:
  * url<String> == url of database
- * tablecount<Number> = aspected count of tables in database (for validation)
+ * tablecount<Number> = aspected count of tables in database (optional)
+ * tables<Array>      = aspected table names (optional)
  * Methods:
  * mirror == start mirroring
  * testdb      == tests db on tablecount
