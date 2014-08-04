@@ -38,7 +38,7 @@
     <property name="facebook.appid" type="string">202972656504444</property>
     <property name="twitter.appid" type="string">TLKuHP7KycTmx9rmAzn1g</property>
     <property name="twitter.appsecret" type="string">mTAPXa74Ak9hCGyuCZOqJtZ7ZPj8m1wIB9WdgF9y80</property>
-    <property name="dbmirrorurl" type="string">http://lecture2go2.rrz.uni-hamburg.de/appdb/</property>
+    <property name="dbmirrorurl" type="string">http://lecture2go1.rrz.uni-hamburg.de/appdb/</property>
     <property name="apiomat.login" type="string">kontaktschmied</property>
     <property name="apiomat.mail" type="string">elb.min@uni-hamburg.de</property>
     <iphone>
