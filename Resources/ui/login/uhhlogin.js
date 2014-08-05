@@ -20,7 +20,7 @@ exports.campusnet = function(_user, _callback) {
 					title : name + '@STiNE',
 					name : name
 				});
-			} 
+			}
 		}
 	};
 	var postvalues = {
