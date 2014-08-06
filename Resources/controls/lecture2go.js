@@ -95,32 +95,29 @@ Lecture2Go.prototype.initVideoDB = function() {
 		});
 	}
 	// now we try if a newer version is on server:
-	function onoffline() {
-		return;
+	var onoffline = function() {
+		/* we now the direct URL of DB */
 		if (Ti.App.Properties.hasProperty('dburl')) {
 			options.onstatuschanged({
-				text : 'Teste aktuelle Datenbank auf Richtigkeit.'
+				text : 'Off – teste auf vorhandene Datenbank'
 			});
-			require('vendor/sqlite.adapter').getDB({
-				url : Ti.App.Properties.getString('dburl'),
-				mirror : false,
-				aspectedtablecount : 5,
-				onload : function(_args) {
-					options.onstatuschanged({
-						text : 'Kein Netz: verwende gültige Offline-Datenbank.'
-					});
-					console.log(_args);
-					DBNAME = _args.dbname;
-					options.onload({
-						success : true,
-						date : old_mtime
-					});
-				}
+			var db = require('vendor/sqlite.adapter')(Ti.App.Properties.getString('dburl'), 4);
+			db.addEventListener('onload', function(_args) {
+				options.onstatuschanged({
+					text : 'Kein Netz: verwende gültige Offline-Datenbank.'
+				});
+				DBNAME = _args.dbname;
+				options.onload({
+					success : true,
+					date : old_mtime
+				});
 			});
-		} else {
-			alert('Kein Internet und auch keine alte, gültige Version der Datenbank');
-		}
-	}
+			db.addEventListener('onerror', function() {
+				alert('Kein Internet und auch keine alte, gültige Version der Datenbank');
+			});
+		} else
+			console.log('Error: dburl unknown');
+	};
 
 	if (Ti.Network.online == false) {
 		console.log('Warning: no network available');
@@ -136,9 +133,7 @@ Lecture2Go.prototype.initVideoDB = function() {
 				options.onstatuschanged({
 					text : 'neue Version vom ' + new_mtime + ' auf dem Lecture2Go-Server.'
 				});
-				var db = require('vendor/sqlite.adapter')({
-					url : res.sqlite.url
-				});
+				var db = require('vendor/sqlite.adapter')(res.sqlite.url, 4);
 				db.startmirror();
 				db.addEventListener('onload', function(_e) {
 					if (_e.success == true) {

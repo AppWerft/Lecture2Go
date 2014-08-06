@@ -17,6 +17,8 @@
  * 		   payload:
  * 				ratio : (0..1)
  *
+ * onerror      == if database is dead and cannot mirror
+ *
  * Usage:
  *
  * var dbmodule = new (require('sqlite.adapter'))('http://URLtoSQLiteDB',{
@@ -29,9 +31,10 @@
  * });
  *
  */
-var DB = function(_url, _expectations) {
+var DB = function(_url, _numberoftables,_aspectedtables) {
 	this.url = _url || '';
-	this.expectations = _expectations || {};
+	this.numberoftables = _numberoftables; 
+	this.aspectedtables = _aspectedtables || [];
 	this.eventhandlers = {};
 	this.dbname = Ti.Utils.md5HexDigest(this.url);
 };
@@ -45,10 +48,8 @@ DB.prototype = {
 				success : true,
 				dbname : that.dbname
 			});
-		else 
-			that.fireEvent('onerror',{});
-		
-
+		else
+			that.fireEvent('onerror', {});
 	},
 	/* public functions; */
 	testdb : function() {
@@ -66,15 +67,15 @@ DB.prototype = {
 		/* Testing */
 		var error = false;
 		switch (true) {
-		case (this.expectations.numberoftables && (this.expectations.numberoftables != tables.count)) :
-			console.log('Error: wrong number of tables. aspected=' + this.expectations.numberoftables + ', real=' + tables.count);
+		case (this.numberoftables && (this.numberoftables != tables.count)) :
+			console.log('Error: wrong number of tables. aspected=' + this.numberoftables + ', real=' + tables.count);
 			error = true;
 			break;
-		case (this.expectations.aspecttables  && (this.expectations.aspecttables.join() != tables.join())):
+		case (this.aspecttables !=[]  && (this.aspecttables.join() != tables.join())):
 			console.log('Error: wrong list of tables.');
 			error = true;
 			break;
-		case (!this.expectations.aspecttables && !this.expectations.numberoftables && !tables.count) :
+		case (!this.aspecttables && !this.numberoftables && !tables.count) :
 			error = true;
 			break;
 		}
@@ -83,8 +84,9 @@ DB.prototype = {
 				DBconn.remove();
 			else
 				DBconn.file.deleteFile();
+			return false;
 		}
-		return (error) ? false : true;
+		return true;
 	},
 	mirror : function() {
 		var that = this;
