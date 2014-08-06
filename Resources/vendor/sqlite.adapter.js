@@ -2,8 +2,8 @@
  * This module shows how you can cache remote SQLite databases
  * Parameters:
  * url<String> == url of database
- * tablecount<Number> = aspected count of tables in database (optional)
- * tables<Array>      = aspected table names (optional)
+ * numberoftables<Number> = aspected count of tables in database (optional)
+ * aspecttables<Array>      = aspected table names (optional)
  * Methods:
  * mirror == start mirroring
  * testdb      == tests db on tablecount
@@ -19,64 +19,73 @@
  *
  * Usage:
  *
- * var dbmodule = new (require('sqlite.adapter'))('http://URLtoSQLiteDB');
+ * var dbmodule = new (require('sqlite.adapter'))('http://URLtoSQLiteDB',{
+ * 		aspectedtables : ['main','labels'],
+ * 		numberoftables : 2
+ * });
  * dbmodule.startmirror();
  * dbmodule.addEventListener('onload',function(_e) {
  * 		if (_e.success==true) Ti.Database.open(_e.dbname);
  * });
  *
  */
-var DB = function() {
-	this.options = arguments[0] || {};
+var DB = function(_url, _expectations) {
+	this.url = _url || '';
+	this.expectations = _expectations || {};
 	this.eventhandlers = {};
-	this.dbname = Ti.Utils.md5HexDigest(this.options.url);
+	this.dbname = Ti.Utils.md5HexDigest(this.url);
 };
 
 DB.prototype = {
 	/* private functions */
 	_onOffline : function() {
 		console.log('Info: offline node ==> try to open cached db');
-		DBconn = Ti.Database.open(dbname);
-		var res = DBconn.execute('SELECT count(*) total FROM sqlite_master WHERE type="table" order by name');
-		if (res.isValidRow()) {
-			var total = res.fieldByName('total');
-			console.log('Info: tables found=' + total + ' aspectedtablecount=' + options.aspectedtablecount);
-			res.close();
-			if (that.options.tablecount  == that._getNumberofTables()) {
-					that.fireEvent('onload', {
-						success : true,
-						dbname : that.dbname
-					});
-			} else {
-				if (Ti.Android)
-					DBconn.remove();
-				else
-					DBconn.file.deleteFile();
-				alert('Für die Aktualisierung der Daten braucht die App wenigstens einmal das Internet');
-				return;
-			}
-		} else {
+		if (this.testdb == true)
+			that.fireEvent('onload', {
+				success : true,
+				dbname : that.dbname
+			});
+		else 
+			that.fireEvent('onerror',{});
+		
+
+	},
+	/* public functions; */
+	testdb : function() {
+		if (!this.dbname)
+			return;
+		var link = Ti.Database.open(this.dbname);
+		var res = link.execute('SELECT tbl_name as name FROM sqlite_master WHERE type="table" order by tbl_name');
+		var tables = [];
+		while (res.isValidRow()) {
+			tables.push(res.fieldByName('name'));
+			res.next();
+		}
+		res.close();
+		link.close();
+		/* Testing */
+		var error = false;
+		switch (true) {
+		case (this.expectations.numberoftables && (this.expectations.numberoftables != tables.count)) :
+			console.log('Error: wrong number of tables. aspected=' + this.expectations.numberoftables + ', real=' + tables.count);
+			error = true;
+			break;
+		case (this.expectations.aspecttables  && (this.expectations.aspecttables.join() != tables.join())):
+			console.log('Error: wrong list of tables.');
+			error = true;
+			break;
+		case (!this.expectations.aspecttables && !this.expectations.numberoftables && !tables.count) :
+			error = true;
+			break;
+		}
+		if (error == true) {
 			if (Ti.Android)
 				DBconn.remove();
 			else
 				DBconn.file.deleteFile();
-			alert('Für die Aktualisierung der Daten braucht die App wenigstens einmal das Internet');
 		}
+		return (error) ? false : true;
 	},
-	_getNumberofTables : function() {
-		if (!this.dbname)
-			return;
-		var link = Ti.Database.open(this.dbname);
-		var res = link.execute('SELECT count(*) total FROM sqlite_master WHERE type="table" order by name');
-		if (res.isValidRow()) {
-			var total = res.fieldByName('total');
-			res.close();
-			link.close();
-			return total;
-		}
-		link.close();
-	},
-	/* public functions; */
 	mirror : function() {
 		var that = this;
 		var xhr = Ti.Network.createHTTPClient({
@@ -105,14 +114,14 @@ DB.prototype = {
 				}
 				var DBconn = Ti.Database.install(tempfile.nativePath, dbname);
 				DBconn.close();
-				if (that.options.tablecount  == that._getNumberofTables())
+				if (that.testdb() == true)
 					that.fireEvent('onload', {
 						success : true,
 						dbname : that.dbname
 					});
 			}
 		});
-		xhr.open('GET', that.options.url);
+		xhr.open('GET', that.url);
 		xhr.send();
 	},
 

@@ -1,16 +1,18 @@
 const VIDEOSTORAGENAME = 'VideoStorage';
 var DBNAME = null;
 const WOWZA_URL = 'https://fms1.rrz.uni-hamburg.de';
-const RTSP_URL  = 'rtsp://fms.rrz.uni-hamburg.de';
-const L2G_URL   = 'https://lecture2go.uni-hamburg.de';
+const RTSP_URL = 'rtsp://fms.rrz.uni-hamburg.de';
+const L2G_URL = 'https://lecture2go.uni-hamburg.de';
 
 const SELECT = 'SELECT v.pathpart, v.downloadLink, v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id, v.description, c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, lectureseries c';
 var moment = require('vendor/moment');
 moment.lang('de_DE');
 
-var Model = function() {
+var Lecture2Go = function() {
 	var that = this;
 	this.getVideosFromSQL = function(sql, withthumb) {
+		if (!DBNAME)
+			return null;
 		var link = Ti.Database.open(DBNAME);
 		var _result = link.execute(sql);
 		var videos = [];
@@ -81,7 +83,7 @@ var Model = function() {
 	}
 };
 
-Model.prototype.initVideoDB = function() {
+Lecture2Go.prototype.initVideoDB = function() {
 	console.log('Info: start initDB ================================');
 	var options = arguments[0] || {};
 	var dbname = null;
@@ -94,6 +96,7 @@ Model.prototype.initVideoDB = function() {
 	}
 	// now we try if a newer version is on server:
 	function onoffline() {
+		return;
 		if (Ti.App.Properties.hasProperty('dburl')) {
 			options.onstatuschanged({
 				text : 'Teste aktuelle Datenbank auf Richtigkeit.'
@@ -133,27 +136,28 @@ Model.prototype.initVideoDB = function() {
 				options.onstatuschanged({
 					text : 'neue Version vom ' + new_mtime + ' auf dem Lecture2Go-Server.'
 				});
-				require('vendor/sqlite.adapter').getDB({
-					url : res.sqlite.url,
-					mirror : (new_mtime == old_mtime) ? false : true,
-					aspectedcontentlength : res.sqlite.filesize,
-					onprogress : options.onprogress,
-					onstatuschanged : options.onstatuschanged,
-					onload : function(_args) {
+				var db = require('vendor/sqlite.adapter')({
+					url : res.sqlite.url
+				});
+				db.startmirror();
+				db.addEventListener('onload', function(_e) {
+					if (_e.success == true) {
 						console.log('Info: new database with mtime and tables' + new_mtime + '    ' + _args.numberoftables);
 						options.onstatuschanged({
 							text : 'Datenbank auf neuestem Stande.'
 						});
-						DBNAME = _args.dbname;
+						DBNAME = _e.dbname;
 						Ti.App.Properties.setString('old_mtime', new_mtime);
-						Ti.App.Properties.setString('dbname', dbname);
+						Ti.App.Properties.setString('dbname', _e.dbname);
 						Ti.App.Properties.setString('dburl', res.sqlite.url);
 						options.onload({
 							success : true,
 							date : new_mtime
 						});
+						Ti.Database.open(_e.dbname);
 					}
 				});
+				db.addEventListener('onprogress', options.onprogress);
 				console.log('Info: mirror started.');
 			} catch(E) {
 				onoffline();
@@ -167,7 +171,7 @@ Model.prototype.initVideoDB = function() {
 	});
 };
 
-/*Model.prototype.mirrorRemoteDB = function(_args) {
+/*Lecture2Go.prototype.mirrorRemoteDB = function(_args) {
  var self = this;
  function existsDB() {
  self.videoDB = Ti.Database.open(DBNAME);
@@ -225,7 +229,7 @@ Model.prototype.initVideoDB = function() {
  xhr.send(null);
  };
  */
-Model.prototype.getTree = function() {
+Lecture2Go.prototype.getTree = function() {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);
 	var q = 'SELECT SUM(videos.hits) hits, MN.treeid treeid FROM videos,lectureseries_tree MN,lectureseries WHERE  videos.lectureseriesId = lectureseries.id AND lectureseries.id = MN.lectureseriesId GROUP BY MN.treeid ORDER by hits';
@@ -244,20 +248,20 @@ Model.prototype.getTree = function() {
 	link.close();
 };
 
-Model.prototype.getVideoStorage = function() {
+Lecture2Go.prototype.getVideoStorage = function() {
 	var storage = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, VIDEOSTORAGENAME);
 	var directory = storage.getDirectoryListing();
 
 };
 
-Model.prototype.getVideoStatus = function(_args) {
+Lecture2Go.prototype.getVideoStatus = function(_args) {
 	var file = Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, VIDEOSTORAGENAME, _args.filename);
 	return {
 		exists : file.exists()
 	};
 };
 
-Model.prototype.saveVideo2Storage = function(_args) {
+Lecture2Go.prototype.saveVideo2Storage = function(_args) {
 	// args:
 	// video : videofilename
 	// onprogress : callback for progress display
@@ -281,7 +285,7 @@ Model.prototype.saveVideo2Storage = function(_args) {
 	xhr.send();
 };
 
-Model.prototype.setFavedVideo = function(_id) {
+Lecture2Go.prototype.setFavedVideo = function(_id) {
 	var id = _id;
 	var res = this.historyDB.execute('SELECT id FROM private WHERE id=' + id);
 	if (res.getRowCount()) {
@@ -292,7 +296,7 @@ Model.prototype.setFavedVideo = function(_id) {
 	res.close();
 };
 
-Model.prototype.setWatchedVideo = function(_id) {
+Lecture2Go.prototype.setWatchedVideo = function(_id) {
 	var id = _id;
 	var res = this.historyDB.execute('SELECT id FROM private WHERE id=' + id);
 	if (res.getRowCount()) {
@@ -303,7 +307,7 @@ Model.prototype.setWatchedVideo = function(_id) {
 	res.close();
 };
 
-Model.prototype.getWatchedVideos = function() {
+Lecture2Go.prototype.getWatchedVideos = function() {
 	var res = this.historyDB.execute('SELECT * from private WHERE faved=0 ORDER BY ctime DESC');
 	var videos = [];
 	while (result.isValidRow()) {
@@ -315,7 +319,7 @@ Model.prototype.getWatchedVideos = function() {
 	result.close();
 };
 
-Model.prototype.getFavedVideos = function() {
+Lecture2Go.prototype.getFavedVideos = function() {
 	var res = this.historyDB.execute('SELECT * from private WHERE faved=1 ORDER BY ctime DESC');
 	var videos = [];
 	while (result.isValidRow()) {
@@ -327,7 +331,7 @@ Model.prototype.getFavedVideos = function() {
 	result.close();
 };
 
-Model.prototype.isFaved = function(_id) {
+Lecture2Go.prototype.isFaved = function(_id) {
 	var res = this.privateDB.execute('SELECT id total from private WHERE id=' + id);
 	if (res.fav.isValidRow()) {
 		is = fav.fieldByName('total');
@@ -336,43 +340,43 @@ Model.prototype.isFaved = function(_id) {
 	return is;
 };
 
-Model.prototype.getVideosByChannel = function(_args) {
+Lecture2Go.prototype.getVideosByChannel = function(_args) {
 	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND c.id =' + _args.id + ' ORDER BY generationDate DESC ';
 	_args.onload({
 		videos : this.getVideosFromSQL(q)
 	});
 };
 
-Model.prototype.getVideoList = function() {
+Lecture2Go.prototype.getVideoList = function() {
 	var options = arguments[0] || {};
 	var offset = (options.min) ? options.min : 0;
 	var limit = (options.max) ? options.max : 150;
 	switch (options.key) {
-		case 'idlist':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id IN (' + options.value.join(',') + ')';
-			break;
-		case 'latest' :
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
-			break;
-		case 'popular':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY hits DESC LIMIT ' + offset + ',' + limit;
-			break;
-		case 'author':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.author="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
-			break;
-		case 'publisher':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.publisher="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
-			break;
-		case 'day':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.generationDate LIKE "' + options.value + '%" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
-			break;
-		case 'channel':
-		case 'lectureseries':
-			var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.lectureseriesId="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+	case 'idlist':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id IN (' + options.value.join(',') + ')';
+		break;
+	case 'latest' :
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+		break;
+	case 'popular':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId ORDER BY hits DESC LIMIT ' + offset + ',' + limit;
+		break;
+	case 'author':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.author="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+		break;
+	case 'publisher':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.publisher="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+		break;
+	case 'day':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.generationDate LIKE "' + options.value + '%" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
+		break;
+	case 'channel':
+	case 'lectureseries':
+		var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.lectureseriesId="' + options.value + '" ORDER BY generationDate DESC LIMIT ' + offset + ',' + limit;
 
-			break;
-		default:
-			return;
+		break;
+	default:
+		return;
 	}
 	options.onload({
 		videos : this.getVideosFromSQL(q)
@@ -380,7 +384,7 @@ Model.prototype.getVideoList = function() {
 	});
 };
 
-Model.prototype.getLatestImageByLectureseries = function(_id) {
+Lecture2Go.prototype.getLatestImageByLectureseries = function(_id) {
 	var link = Ti.Database.open(DBNAME);
 	var q = 'SELECT * FROM videos WHERE filename <> "" AND lectureseriesid=' + _id + ' ORDER BY id DESC LIMIT 0,1';
 	var result = link.execute(q);
@@ -399,7 +403,7 @@ Model.prototype.getLatestImageByLectureseries = function(_id) {
 	return null;
 };
 
-Model.prototype.getLectureseriesByTreeId = function() {
+Lecture2Go.prototype.getLectureseriesByTreeId = function() {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);
 	var q = 'SELECT lectureseries.* from lectureseries,lectureseries_tree WHERE lectureseries.id=lectureseries_tree.lectureseriesid AND lectureseries_tree.treeid=' + options.id;
@@ -426,7 +430,7 @@ Model.prototype.getLectureseriesByTreeId = function() {
 	});
 };
 
-Model.prototype.searchNeedle = function() {
+Lecture2Go.prototype.searchNeedle = function() {
 	var options = arguments[0] || {};
 	limit = 500;
 	console.log('Info: searching by „' + options.needle + '“');
@@ -434,11 +438,11 @@ Model.prototype.searchNeedle = function() {
 	options.onload(this.getVideosFromSQL(q));
 };
 
-Model.prototype.getVideoById = function() {
+Lecture2Go.prototype.getVideoById = function() {
 	var options = arguments[0] || {};
 	var q = SELECT + ' WHERE c.id=v.lectureseriesId AND v.id = "' + options.id + '"';
 	return this.getVideosFromSQL(q,true)[0];
 };
 
-module.exports = Model;
+module.exports = Lecture2Go;
 

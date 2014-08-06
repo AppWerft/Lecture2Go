@@ -1,4 +1,3 @@
-// Toni   d98b399c4bbb9e78b35d7aad753ef344ed60dea5
 
 (function() {
 	console.log('Info: Starting App ============================');

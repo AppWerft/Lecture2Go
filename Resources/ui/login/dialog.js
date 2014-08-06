@@ -1,4 +1,4 @@
-exports.create = function(_options, _callback) {
+module.exports = function(_options, _callback) {
 	var w = Ti.Platform.displayCaps.platformWidth;
 	var resetProgress = function() {
 		clearInterval(cron);
