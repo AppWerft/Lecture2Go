@@ -4,18 +4,19 @@ const WOWZA_URL = 'https://fms1.rrz.uni-hamburg.de';
 const RTSP_URL = 'rtsp://fms.rrz.uni-hamburg.de';
 const L2G_URL = 'https://lecture2go.uni-hamburg.de';
 
-const SELECT = 'SELECT v.pathpart, v.downloadLink, v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id, v.description, c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, lectureseries c';
+const SELECT = 'SELECT v.pathpart, v.downloadLink, v.lectureseriesId einrichtungId, v.generationDate ctime, v.pathpart, v.resolution, v.filename, v.duration,v.title title,v.hits,v.author,v.publisher,v.id id,  c.nr nr,c.lang lang, c.id channelid, c.name channelname FROM videos v, channels c';
 var moment = require('vendor/moment');
 moment.lang('de_DE');
 
 var Lecture2Go = function() {
 	var that = this;
 	this.getVideosFromSQL = function(sql, withthumb) {
-		if (!DBNAME)
-			return null;
-		var link = Ti.Database.open(DBNAME);
-		var _result = link.execute(sql);
 		var videos = [];
+		var link = Ti.Database.open(DBNAME);
+		console.log(sql);
+		//return videos;
+		var _result = link.execute(sql);
+		console.log(_result);
 		while (_result.isValidRow()) {
 			if (_result.fieldByName('resolution') && _result.fieldByName('duration')) {
 				var resolution = _result.fieldByName('resolution');
@@ -23,7 +24,6 @@ var Lecture2Go = function() {
 				var ratio = regex.exec(resolution);
 				var idstr = _result.fieldByName('filename').replace(/\.mp4/, '');
 				var duration = _result.fieldByName('duration').replace(/\.([\d]+)/, '');
-
 				var video = {
 					ctime : _result.fieldByName('ctime'),
 					'duration_min' : parseInt(duration.split(':')[0]) * 60 + parseInt(duration.split(':')[1]),
@@ -57,7 +57,6 @@ var Lecture2Go = function() {
 				};
 				if (withthumb)
 					video.channel.thumb = that.getLatestImageByLectureseries(_result.fieldByName('channelid')).thumb;
-
 				videos.push(video);
 			}
 			_result.next();
@@ -101,8 +100,8 @@ Lecture2Go.prototype.initVideoDB = function() {
 			options.onstatuschanged({
 				text : 'Off – teste auf vorhandene Datenbank'
 			});
-			var db = require('vendor/sqlite.adapter')(Ti.App.Properties.getString('dburl'), 4);
-			db.addEventListener('onload', function(_args) {
+			var db = new (require('vendor/sqlite.adapter'))(Ti.App.Properties.getString('dburl'), 4);
+			db.on('load', function(_args) {
 				options.onstatuschanged({
 					text : 'Kein Netz: verwende gültige Offline-Datenbank.'
 				});
@@ -112,7 +111,7 @@ Lecture2Go.prototype.initVideoDB = function() {
 					date : old_mtime
 				});
 			});
-			db.addEventListener('onerror', function() {
+			db.on('error', function() {
 				alert('Kein Internet und auch keine alte, gültige Version der Datenbank');
 			});
 		} else
@@ -125,38 +124,47 @@ Lecture2Go.prototype.initVideoDB = function() {
 		return;
 	}
 	var xhr = Ti.Network.createHTTPClient({
-		onerror : onoffline,
+		onerror : function() {
+			console.log('Error: retrieving meta infos unsuccessfull');
+			onoffline();
+		},
 		onload : function() {
+			console.log('Info: server answered with meta infos');
 			try {
 				var res = JSON.parse(this.responseText);
-				new_mtime = res.mtime;
-				options.onstatuschanged({
-					text : 'neue Version vom ' + new_mtime + ' auf dem Lecture2Go-Server.'
-				});
-				var db = require('vendor/sqlite.adapter')(res.sqlite.url, 4);
-				db.startmirror();
-				db.addEventListener('onload', function(_e) {
-					if (_e.success == true) {
-						console.log('Info: new database with mtime and tables' + new_mtime + '    ' + _args.numberoftables);
-						options.onstatuschanged({
-							text : 'Datenbank auf neuestem Stande.'
-						});
-						DBNAME = _e.dbname;
-						Ti.App.Properties.setString('old_mtime', new_mtime);
-						Ti.App.Properties.setString('dbname', _e.dbname);
-						Ti.App.Properties.setString('dburl', res.sqlite.url);
-						options.onload({
-							success : true,
-							date : new_mtime
-						});
-						Ti.Database.open(_e.dbname);
-					}
-				});
-				db.addEventListener('onprogress', options.onprogress);
-				console.log('Info: mirror started.');
+
 			} catch(E) {
+				console.log(E);
+				console.log('Error: cannot parse JSON\n' + this.responseText);
 				onoffline();
 			}
+			new_mtime = res.mtime;
+			options.onstatuschanged({
+				text : 'neue Version vom ' + moment(new_mtime).format('dd.mm.YY') + ' auf dem Lecture2Go-Server.'
+			});
+			var Module = require('vendor/sqlite.adapter');
+			var Db = new Module(res.sqlite.url, 4);
+		
+			Db.mirror();
+			Db.on('load', function(_e) {
+				if (_e.success == true) {
+					console.log(_e);
+					console.log('Info: new database with mtime and tables ' + new_mtime);
+					options.onstatuschanged({
+						text : 'Datenbank auf neuestem Stande.'
+					});
+					DBNAME = _e.dbname;
+					Ti.App.Properties.setString('old_mtime', new_mtime);
+					Ti.App.Properties.setString('dbname', _e.dbname);
+					Ti.App.Properties.setString('dburl', res.sqlite.url);
+					options.onload({
+						success : true,
+						date : new_mtime
+					});
+				}
+			});
+			//	Db.on('progress', options.onprogress);
+			console.log('Info: mirror started.');
 		}
 	});
 	xhr.open('GET', Ti.App.Properties.getString('dbmirrorurl'), true);
@@ -224,10 +232,10 @@ Lecture2Go.prototype.initVideoDB = function() {
  xhr.send(null);
  };
  */
-Lecture2Go.prototype.getTree = function() {
+Lecture2Go.prototype.getTree = function(_options,_onload) {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);
-	var q = 'SELECT SUM(videos.hits) hits, MN.treeid treeid FROM videos,lectureseries_tree MN,lectureseries WHERE  videos.lectureseriesId = lectureseries.id AND lectureseries.id = MN.lectureseriesId GROUP BY MN.treeid ORDER by hits';
+	var q = 'SELECT SUM(videos.hits) hits, MN.treeid treeid FROM videos,channel_tree MN,channels WHERE  videos.lectureseriesId = channels.id AND channels.id = MN.channelid GROUP BY MN.treeid ORDER by hits';
 	var result = link.execute(q);
 	var hits = {};
 	while (result.isValidRow()) {
@@ -237,7 +245,9 @@ Lecture2Go.prototype.getTree = function() {
 	result.close();
 	var res = link.execute('SELECT json FROM tree LIMIT 1');
 	if (res) {
-		options.onload(JSON.parse(res.fieldByName('json')), hits);
+		console.log(res.fieldByName('json'));
+		console.log(hits);
+		_onload(JSON.parse(res.fieldByName('json')), hits);
 		res.close();
 	}
 	link.close();
@@ -375,7 +385,6 @@ Lecture2Go.prototype.getVideoList = function() {
 	}
 	options.onload({
 		videos : this.getVideosFromSQL(q)
-		//	section : require('modules/menueitems').list[Ti.App.Properties.getString('menuemodus')]
 	});
 };
 
@@ -401,7 +410,7 @@ Lecture2Go.prototype.getLatestImageByLectureseries = function(_id) {
 Lecture2Go.prototype.getLectureseriesByTreeId = function() {
 	var options = arguments[0] || {};
 	var link = Ti.Database.open(DBNAME);
-	var q = 'SELECT lectureseries.* from lectureseries,lectureseries_tree WHERE lectureseries.id=lectureseries_tree.lectureseriesid AND lectureseries_tree.treeid=' + options.id;
+	var q = 'SELECT channels.* from channels,channel_tree WHERE channels.id=channel_tree.channelid AND channel_tree.treeid=' + options.id;
 	var result = link.execute(q);
 	var lectureseries = [];
 	while (result.isValidRow()) {

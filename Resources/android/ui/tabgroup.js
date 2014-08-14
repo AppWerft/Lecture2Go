@@ -29,18 +29,18 @@ exports.create = function() {
 		icon : 'images/favorite.png',
 		title : 'Abonnierte Vorlesungen',
 		window : require('ui/mysubscribedchannels.window').create()
-	}, {
+	}/*, {
 		icon : 'images/favorite.png',
 		title : 'Live-Liste',
 		window : require('ui/lastwatched.window').create()
-	}];
-	if (Ti.App.Properties.getString('apikey') == 'f6sv005')
+	}*/];
+	/*if (Ti.App.Properties.getString('apikey') == 'f6sv005')
 		taboptions.push({
 			icon : 'images/favorite.png',
 			title : 'Live-Karte',
 			window : require('ui/map.window').create()
 		});
-
+*/
 	for (var i = 0; i < taboptions.length; i++) {
 		tabs[i] = Ti.UI.createTab({
 			title : taboptions[i].title,
@@ -74,6 +74,6 @@ exports.create = function() {
 		});
 		dialog.show();
 	});
-
+	
 	return self;
 };

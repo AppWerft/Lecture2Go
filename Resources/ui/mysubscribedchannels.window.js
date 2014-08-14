@@ -14,12 +14,14 @@ exports.create = function() {
 	self.updateSections = function() {
 		if (!self.apiomatuserready)
 			return;
-		console.log('Info: start favchannel update');	
+		console.log('Info: start favchannel update');
 		Ti.App.Apiomat.getMySubscribedChannels({}, {
 			onload : function(_listofchannels) {
-				console.log('Info: start favchannel rendering');	
+				console.log('Info: start favchannel rendering');
 				if (!_listofchannels) {
-					Ti.UI.createNotification({message:'Es liegen noch keine abonnierten Vorlesungsreihen vor.'}).show();
+					Ti.UI.createNotification({
+						message : 'Es liegen noch keine abonnierten Vorlesungsreihen vor.'
+					}).show();
 					return;
 				}
 				var dataitems = [], channelitem;
@@ -51,12 +53,12 @@ exports.create = function() {
 		});
 	};
 	self.listview.addEventListener('itemclick', function(_e) {
-		var channel =JSON.parse( _e.itemId);
+		var channel = JSON.parse(_e.itemId);
 		require('ui/videolist.window').create({
 			key : 'channel',
 			value : channel.id,
-			title :'Abonnierte Vorlesungsreihe',
-			subtitle: channel.name,
+			title : 'Abonnierte Vorlesungsreihe',
+			subtitle : channel.name,
 		}).open();
 	});
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
@@ -64,6 +66,7 @@ exports.create = function() {
 		self.updateSections();
 	});
 	Ti.App.addEventListener('app:apiomatuser_ready', function() {
+		return;
 		self.apiomatuserready = true;
 		self.updateSections();
 

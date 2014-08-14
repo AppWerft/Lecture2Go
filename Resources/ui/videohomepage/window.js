@@ -1,5 +1,5 @@
 exports.create = function(_id) {
-	var self = require('modules/l2g').create();
+	var self = require('modules/l2g').create({title:'Lecture2Go',subtitle:''});
 	self.addEventListener('open', function() {
 		var videodata = Ti.App.Lecture2Go.getVideoById({
 			id : _id

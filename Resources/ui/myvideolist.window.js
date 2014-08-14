@@ -54,6 +54,7 @@ exports.create = function() {
 		win.open();
 	});
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
+		return;
 		self.lecture2goready = true;
 		self.updateSections();
 	});

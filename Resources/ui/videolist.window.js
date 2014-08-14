@@ -61,17 +61,10 @@ exports.create = function() {
 		if (Ti.Android) {
 			var activity = self.getActivity();
 			if (activity.actionBar) {
-				var abextras = require('com.alcoapps.actionbarextras');
-				abextras.setExtras({
-					title : options.title,
-					subtitle : options.subtitle
-				});
-				if (options.value) {
-					activity.actionBar.setDisplayHomeAsUp(true);
-					activity.actionBar.onHomeIconItemSelected = function() {
-						self.close();
-					};
-				}
+
+				activity.actionBar.title = options.title;
+				activity.actionBar.subtitle = options.subtitle;
+				
 				if (options.key == 'channel' || options.key == 'lectureseries') {
 					activity.onCreateOptionsMenu = function(e) {
 						var SUBSCRIBE = 0, UNSUBSCRIBE = 1;
@@ -81,7 +74,7 @@ exports.create = function() {
 							showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 							itemId : SUBSCRIBE,
 							visible : (subscribed) ? false : true,
-							icon :  Ti.App.Android.R.drawable.ic_action_no_favorite 
+							icon : Ti.App.Android.R.drawable.ic_action_no_favorite
 						}).addEventListener("click", function() {
 							e.menu.removeItem(SUBSCRIBE);
 							Ti.App.Apiomat.subscribeChannel({
@@ -99,7 +92,7 @@ exports.create = function() {
 							itemId : UNSUBSCRIBE,
 							visible : (subscribed) ? true : false,
 
-							icon :  Ti.App.Android.R.drawable.ic_action_favorite 
+							icon : Ti.App.Android.R.drawable.ic_action_favorite
 						}).addEventListener("click", function() {
 
 						});

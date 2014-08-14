@@ -6,13 +6,11 @@ exports.create = function() {
 	});
 	self.add(self.container);
 	Ti.App.addEventListener('app:lecture2go_ready', function() {
-		Ti.App.Lecture2Go.getTree({
-			onload : function(_sections,_hits) {
-				for (var key in _sections) {
-					views.push(require('ui/departmenttree.listview').create(_sections[key],_hits));
-				}
-				self.container.setViews(views);
+		Ti.App.Lecture2Go.getTree(null, function(_sections, _hits) {
+			for (var key in _sections) {
+				views.push(require('ui/departmenttree.listview')(_sections[key], _hits));
 			}
+			self.container.setViews(views);
 		});
 	});
 	return self;

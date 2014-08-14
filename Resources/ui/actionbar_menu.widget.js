@@ -6,6 +6,8 @@ module.exports = function() {
 		return;
 	activity.actionBar.setDisplayHomeAsUp(false);
 	activity.actionBar.setTitle('Lecture2Go');
+	activity.actionBar.setSubtitle('Videoportal der Uni Hamburg');
+	
 	activity.onCreateOptionsMenu = function(e) {
 		e.menu.add({
 			title : "Suchen",
